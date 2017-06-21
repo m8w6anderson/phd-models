@@ -1,0 +1,102 @@
+%% Eigen-Analysis
+% This file computes the eigenvalues, eigenvectors and shows which species
+% most affect the eigenvalues that are most responsible for the system
+% dynamics.
+
+% Reset all parameters
+integrate_DLE;
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+
+eigvals = zeros(length(T), length(IC)); % set up matrix
+eigvec = eigvals;                       % same length as eigvals
+eigvecid = eigvals;                     % same length as eigvals
+
+%% Compute eigenvalues and eigenvectors
+% If dx/dt = f(x), then Jacobian = small change function * f(x)
+% so that the kth row of J ~= (f(x + eps*vk) - f(x))/eps where eps is a
+% very small change and vk represents the kth element of J.
+
+for p = 1:length(T)                 % iterate through each time step
+    eps = 1e-2;                     % set eps << 1
+    for q = 1:length(IC)            % iterate through species
+      vk = zeros(1, length(IC));    % set up vk vector...
+      vk(q) = eps;                  % ...as eps
+      
+      % compute the Jacobian using the kth row equation above, 
+      % where f = degrhsVRoff() and x = Y()
+      J(:,q) = (degrhsVRoff(T(p), (Y(p,:) + vk)', k,kr,kc,s,r,v) - degrhsVRoff(T(p), Y(p,:)', k,kr,kc,s,r,v))/eps;
+      
+    end
+    [evec, eval] = eig(J);                  % output eigenvalues and eigenvectors
+    [exm, evi] = max(real(diag(eval)));     % 
+    
+    
+    [eigvec(p,:), eigvecid(p,:)] = sort(abs(evec(:,evi)),'descend');
+    eigvals(p,:) = sort(real(eig(J)),1,'ascend');
+end
+
+% return % remove to output the figures
+
+%% Eigenvalues and eigenvectors plots
+
+figure;
+
+% Plot the eigenvalues - the two positive EVs can be found by zooming in on
+% the zero line at around 4.3 hours.
+subplot(2,2,1)
+plot(T/3600, eigvals(:,:));
+xlim([0 12])
+set(gca,'XTick',0:2:12)
+ylim([-140 20])
+set(gca,'YTick',-140:20:20)
+ylabh(1) = ylabel('Eigenvalues');
+
+% zoomed in plot of the above.
+subplot(2,2,2)
+plot(T/3600, eigvals(:,:));
+xlim([3.2 4.4])
+set(gca,'XTick',3.2:0.2:4.4)
+ylim([-0.0011 0.0021])
+set(gca,'YTick',-0.001:0.001:0.002)
+set(gca,'yticklabel',{'-1','0','1','2'})
+ylabh(2) = ylabel('Eigenvalues (x10^-^3)');
+
+% Plot the eigenvectors
+subplot(2,2,3)
+plot(T/3600, eigvec(:,:));
+xlim([0 12])
+set(gca,'XTick',0:2:12)
+ylim([-0.05 1.05])
+set(gca,'YTick',[0 1])
+ylabh(3) = ylabel('Eigenvectors');
+
+% Plot to show which species most affect the two highest (and most
+% unstable) eigenvalues - read from right to left. The first two species
+% are C3_Ub and Ligand, but these two occur outside the critical transition
+% phase at around 4.3 hours, seen in the two plots above. The next two
+% species are then CytoC and CytoCm, followed by PARP and cPARP (which are
+% the endpoints so are ignored), and then by Apaf and pC9.
+subplot(2,2,4)
+plot(T/3600, eigvecid(:,1:2));
+xlim([0 12])
+set(gca,'XTick',0:2:12)
+ylim([-2 62])
+set(gca,'YTick',0:10:60)
+ylabh(4) = ylabel('Eigenvector IDs');
+
+
+
+set(findall(gcf,'type','text'),'fontSize',10,'FontName','Times New Roman');
+set(findobj(gcf,'type','line'),'LineWidth',1.5,'LineSmoothing','on');
+
+for iii = 1:4
+    subplot(2,2,iii)
+    xlabh = xlabel('Time (hrs)');
+    set(xlabh,'fontweight','b','FontName','Times New Roman');
+end
+for iv = 1:4
+    set(ylabh(iv),'fontweight','b','FontName','Times New Roman');
+end
+
