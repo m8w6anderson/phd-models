@@ -1,0 +1,16 @@
+%% Set initial concentrations
+
+Bclx  = 1E3;        % Bclx = Mcl-1 -- inhibits tBid
+Bax   = 8E4;        % Bax -- activated by tBid
+Bcl2  = 2E4;        % Bcl-2 -- inhibits Bax*
+M     = 5E5;        % Mito -- activates the pore when bound to Bax*4
+CytoC = 5E5;        % Cytochrome C
+Smac  = 1E5;        % Smac
+
+v     = .07;        % mitochondrial compartment vol. ~7% < cytosolic compartment
+
+trans_in  = .01;    % translocate from Cytosol (CC) --> Mitochondria (MC)
+trans_out = .01/v;  % translocate from Mitochondria (MC) --> Cytosol (CC)
+
+IC=zeros(24,1);
+IC(2)=Bclx;    IC(4)=Bax;   IC(8)=Bcl2;  IC(14)=M;   IC(17)=CytoC;   IC(20)=Smac;
