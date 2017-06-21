@@ -1,0 +1,144 @@
+%% %%%%%%%%% Reaction Definitions and corresponding rates (Aldridge et al. 2011)%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% k() denotes forward reaction / k_() is reverse / kc() is catalytic / %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%% C8* is active form of pC8 / <-> is a reversible reaction %%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Ligand + Receptor <-> Ligand:Receptor -> DISC                            k(1),  k_(1),  kc(1)
+% DISC + FLIP <-> DISC:FLIP                                                k(2),  k_(2)
+% DISC + pC8 <-> DISC:pC8 -> DISC + C8*                                    k(3),  k_(3),  kc(3)
+% C8* + Bar <-> C8*:Bar                                                    k(4),  k_(4)
+% C8* + pC3 <-> C8*:pC3 -> C8* + C3*                                       k(5),  k_(5),  kc(5)
+% C3* + pC6 <-> C3*:pC6 -> C3* + C6*                                       k(6),  k_(6),  kc(6)
+% C6* + pC8 <-> C6*:pC8 -> C6* + C8*                                       k(7),  k_(7),  kc(7)
+% C3* + XIAP <-> C3*:XIAP -> C3*_Ub + XIAP                                 k(8),  k_(8),  kc(8)
+% C3* + PARP <-> C3*:PARP -> C3* + cPARP                                   k(9),  k_(9),  kc(9)
+% C8* + Bid <-> C8*:Bid -> C8* + tBid                                      k(10), k_(10), kc(10)
+% tBid + Mcl-1 <-> tBid:Mcl-1                  %%%%%%% NB: Mcl-1 = Bclx    k(11), k_(11)
+% tBid + Bax <-> tBid:Bax -> tBid + Bax*       %%%%%%% NB: Bax* = aBax     k(12), k_(12), kc(12)
+% Bax* <-> Bax*_m                              %%%%%%% NB: Bax*_m = MBax   k(13), kr(13)
+% Bax*_m + Bcl-2 <-> Bax*_m:Bcl-2                                          k(14), kr(14)
+% Bax*_m + Bax*_m <-> Bax*2_m                                              k(15), kr(15)
+% Bax*2_m + Bcl-2 <-> Bax*2_m:Bcl-2                                        k(16), kr(16)
+% Bax*2_m + Bax*2_m <-> Bax*4_m                                            k(17), kr(17)
+% Bax*4_m + Bcl-2 <-> Bax*4_m:Bcl-2                                        k(18), kr(18)
+% Bax*4_m + Pore <-> Bax*4_m:Pore -> Pore*                                 k(19), kr(19), kc(19)
+% Pore* + Cytoc_m <-> Pore*:Cytoc_m -> Pore* + Cytoc_r                     k(20), kr(20), kc(20)
+% Pore* + Smac_m <-> Pore*:Smac_m -> Pore* + Smac_r                        k(21), kr(21), kc(21)
+% Pore* -> Pore                                                            kdeg(41)
+% Cytoc_r <-> Cytoc                                                        k(22), kr(22)
+% Cytoc + Apaf <-> Cytoc:Apaf -> Cytoc + Apaf*                             k(23), kr(23), kc(23)
+% Apaf* + C9 <-> Apoptosome                                                k(24), kr(24)
+% Apoptosome + pC3 <-> Apoptosome:pC3 -> Apoptosome + C3*                  k(25), kr(25), kc(25)
+% Smac_r <-> Smac                                                          k(26), kr(26)
+% Apoptosome + XIAP <-> Apoptosome:XIAP                                    k(27), kr(27)
+% Smac + XIAP <-> Smac:XIAP                                                k(28), kr(28)
+% Receptor* <-> Ligand + Receptor                                          k(31), kr(31)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% The Rates...
+
+% Ligand + Receptor <-> Ligand:Receptor -> DISC
+k(1)=4E-7; kr(1)=1E-3; kc(1)=5E-5; % 060803
+
+% DISC + FLIP <-> DISC:FLIP   
+k(2)=1E-6; kr(2)=1E-3;
+
+% DISC + pC8 <-> DISC:pC8 -> DISC + C8* 
+k(3)=.1E-6; kr(3)=1E-3; kc(3)=1;
+
+% C8* + Bar <-> C8*:Bar  
+k(4)=1E-6; kr(4)=1E-3;
+
+% C8* + pC3 <-> C8*:pC3 -> C8* + C3* 
+k(5)=1E-7; kr(5)=1E-3; kc(5)=1;
+
+% C3* + pC6 <-> C3*:pC6 -> C3* + C6* 
+k(6)=.5E-6; kr(6)=1E-3; kc(6)=1;
+
+% C6* + pC8 <-> C6*:pC8 -> C6* + C8*
+k(7)=3E-8; kr(7)=1E-3; kc(7)=1; % 060829
+
+% C3* + XIAP <-> C3*:XIAP -> C3*_Ub + XIAP
+k(8)=.25*7e-5; kr(8)=1.67e-5;  kc(8)=1.5*1.67e-4;
+
+% C3* + PARP <-> C3*:PARP -> C3* + cPARP
+k(9)=1E-6; kr(9)=1E-3; kc(9)=1;
+
+% C8* + Bid <-> C8*:Bid -> C8* + tBid
+k(10)=1E-7; kr(10)=1E-3; kc(10)=1;
+
+% tBid + Bclx <->  tBid:Bclx        
+k(11)=1E-6; kr(11)=1E-3; 
+
+% Bax + tBid <--> Bax:tBid --> Bax* + tBid       
+k(12)=1E-7; kr(12)=1E-3; kc(12)=1;
+
+% Bax* <-->  MBax 
+k(13)=trans_in; kr(13)=trans_out;
+
+% MBax + Bcl-2 <-->  MBax:Bcl-2  
+k(14)=1E-6; kr(14)=1E-3; 
+
+% MBax + MBax <-->  MBax:MBax == Bax2
+k(15)=1E-6; kr(15)=1E-3;
+
+% Bax2 + Bcl-2 <-->  MBax2:Bcl-2  
+k(16)=1E-6; kr(16)=1E-3; % RIGHT
+
+% Bax2 + Bax2 <-->  Bax2:Bax2 == Bax4
+k(17)=1E-6; kr(17)=1E-3;
+
+% Bax4 + Bcl-2 <-->  MBax4:Bcl-2  
+k(18)=1E-6; kr(18)=1E-3; % RIGHT
+
+% Bax4 + Mit0 <-->  Bax4:Mito -->  AMito  
+k(19)=1E-6; kr(19)=1E-3; kc(19)=1;
+
+% AMit0 + mCytoC <-->  AMito:mCytoC --> AMito + ACytoC  
+k(20)=2E-6; kr(20)=1E-3; kc(20)=10; % IT
+
+% AMit0 + mSMac <-->  AMito:mSmac --> AMito + ASmac  
+k(21)=2E-6; kr(21)=1E-3; kc(21)=10; % IT
+
+% ACytoC <-->  cCytoC
+k(22)=trans_out; kr(22)=trans_in;
+
+% Apaf + cCytoC <-->  Apaf:cCytoC  
+k(23)=5E-7; kr(23)=1E-3; kc(23)=1;
+
+% Apaf:cCytoC + Procasp9 <-->  Apoptosome  
+k(24)=5E-8; kr(24)=1E-3;
+
+% Apop + pCasp3 <-->  Apop:cCasp3 --> Apop + Casp3  
+k(25)=5E-9; kr(25)=1E-3; kc(25)=1;
+
+% ASmac <-->  cSmac
+k(26)=trans_out; kr(26)=trans_in;
+
+% Apop + XIAP <-->  Apop:XIAP  
+k(27)=2E-6; kr(27)=1E-3;
+
+% cSmac + XIAP <-->  cSmac:XIAP  
+k(28)=7E-6; kr(28)=1E-3;
+
+% fret + casp8 <-->  F:C8  
+k(29)=5E-8; kr(29)=1E-3; kc(29)=1;
+
+% fret + casp3 <-->  F:C3  
+k(30)=6E-7; kr(30)=1E-3; kc(30)=1;
+
+% R* <-->  L + R   
+k(31)=.001; kr(31)=0; kc(31)=0;
+
+%% Assign degredation rates
+r=ones(59,1).*(1/2)*(1/24)*(1/3600);    % = 5.8E-6 degradation rates for all species, except...
+r(41)=.0001;                            % M* -> M (i.e. Pore deactivation and Mito reproduction)
+
+%% Assign the synthesis rates
+s = zeros(59,1); %synthesis rates
+for i=[2,5,7,10,12,15,19,21,24,27,29,33,39,42,45,49,52],
+  s(i)=r(i).*IC(i); % function of degredation rates and initial conditions
+end,
+s(1)=0;
+
