@@ -1,0 +1,73 @@
+% ############## NORMALISING DAPI IMAGES FOR MICROSCOPE ERRORS ############
+% -------------------------------------------------------------------------
+% normalisation.m allows the user to correct microscopy images for issues
+% with non-uniform brightness. In order to use this, you need an image of a
+% blank microscopy field (JPEG) and a DAPI field image to test it on. This
+% script first performs the normalisation and thresholding, and then calls
+% counting_segmentation_v2.m for image processing (e.g. for use of the
+% watershed algorithm).
+
+
+%% Checks if target DAPI image is already saved in the workspace
+
+prompt1 = 'Is target DAPI JPEG already in workspace? Y/N [Default: Y]: ';
+str = input(prompt1,'s');
+if str == 'N' | str == 'n';
+    DAPI = imread(uigetfile('*.jpg','Select DAPI JPEG'));
+end
+
+%% Checks if Normalisation image is already saved in the workspace
+
+prompt2 = 'Is Normalisation JPEG already in workspace? Y/N [Default: Y]: ';
+str = input(prompt2,'s');
+if str == 'N' | str == 'n';
+    Norm = imread(uigetfile('*.jpg','Select normalisation JPEG'));
+end
+
+
+%% Checks DAPI image and Normalisation image are the same size (must be)
+
+if size(Norm) ~= size(DAPI)
+    display('Normalisation image is not the same size as DAPI image')
+    return;
+end
+
+%% Create a Gaussian image filter from the normalisation image and use this to adjust the DAPI image
+
+G = fspecial('gaussian',[50 50],7);
+NormG = imfilter(Norm,G,'same');
+NormGAdj = imcomplement(NormG)*0.5;
+
+DAPIAdj = DAPI*0.5;
+
+DAPIfix = NormGAdj + DAPIAdj;
+
+
+%% Create a thresholded image from the above for use in image processing (counting_segmentation_v2.m)
+
+DAPIseg = DAPIfix;
+
+DAPIseg(DAPIfix>200) = 255;
+DAPIseg(DAPIfix<=200) = 200;
+DAPIseg(DAPIfix<=175) = 175;
+DAPIseg(DAPIfix<=150) = 150;
+DAPIseg(DAPIfix<=120) = 125;
+DAPIseg(DAPIfix<=110) = 100;
+DAPIseg(DAPIfix<=100) = 75;
+DAPIseg(DAPIfix<=90) = 50;
+DAPIseg(DAPIfix<=86) = 0;
+
+% DAPIseg(DAPIfix>110) = 200;
+% DAPIseg(DAPIfix<=100) = 150;
+% DAPIseg(DAPIfix<=90) = 0;
+
+figure(1)
+subplot_tight(2,3,1,.01), imshow(Norm), title('(1)  Blank Field','fontsize',16)
+subplot_tight(2,3,2,.01), imshow(NormGAdj), title('(2)  Gaussian Complement','fontsize',16)
+subplot_tight(2,3,3,.01), imshow(DAPI), title('(3)  Original Dapi Field','fontsize',16)
+subplot_tight(2,3,4,.01), imshow(DAPIAdj), title('(4)  Lower Brightness of (3)','fontsize',16)
+subplot_tight(2,3,5,.01), imshow(DAPIfix), title('(5)  Normalised (4) using (2)','fontsize',16)
+subplot_tight(2,3,6,.01), imshow(DAPIseg), title('(6)  Thresholding using (5)','fontsize',16)
+
+A = DAPIfix;
+counting_segmentation_v2
