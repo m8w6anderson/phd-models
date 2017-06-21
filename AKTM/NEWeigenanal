@@ -1,0 +1,152 @@
+%% Eigen-Analysis
+% Computes the system's eigenvalues and eigenvectors
+
+clear all
+
+NEWintegrate_DLE;
+
+[T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 16]*3600,IC,options);
+
+eigvals = zeros(length(T), length(IC));  % set up matrix
+eigvecs = eigvals;                       % same length as eigvals
+eigvecIDs = eigvals;                     % same length as eigvals
+
+%% Compute eigenvalues and eigenvectors
+% If dx/dt = f(x), then Jacobian = small change function * f(x)
+% so that the kth row of J ~= (f(x + eps*vk) - f(x))/eps where eps is a
+% very small change and vk represents the kth element of J.
+
+for p = 1:length(T)                 % iterate through each time step
+    eps = 0.1;                     % set eps << 1
+    for q = 1:length(IC)            % iterate through species
+      vk = zeros(1, length(IC));    % set up vk vector...
+      vk(q) = eps;                  % ...as eps
+      
+      % compute the Jacobian using the kth row equation above, 
+      % where f = NEWdegrhsVRoff2() and x = Y()
+      J(:,q) = (NEWdegrhsVRoff2(T(p), (Y(p,:) + vk)',k,kr,kc,s,r,v) - NEWdegrhsVRoff2(T(p), Y(p,:)',k,kr,kc,s,r,v))/eps;
+      
+    end
+    [evec, eval] = eig(J);                  % output eigenvalues and eigenvectors
+    [exm, evi] = max(real(diag(eval)));     
+    
+    
+    [eigvecs(p,:), eigvecIDs(p,:)] = sort(abs(evec(:,evi)),'descend');
+    eigvals(p,:) = sort(real(eig(J)),1,'descend');
+end
+
+% return % remove to output the figures
+
+%% Eigenvalues and eigenvectors plots
+
+figure(4);
+% All Eigenvalues Plot
+plot(T/3600, eigvals(:,:));
+
+% % Checking which eigenvalues are positive
+% for i = 5:10
+%     figure(i);
+%     % Define the range of eigenvalues for each figure (i.e. 1-6, 7-13, etc.)
+%     eig_first = 6*(i-5)+1; eig_last = 6*(i-5)+6;
+% 
+%     % Plot the eigenvalues in left column (subplots 1,4,7,10,13,16)
+%     for j = eig_first:eig_last
+%         subplot(6,3,(3*j)-(3*eig_first)+1)
+%         splitcolorplot(T/3600, eigvals(:,j),'g','k')
+%         xlim([0 16])
+%         yupper = max(eigvals(1:end,j)) + range(eigvals(1:end,j))*0.05;
+%         ylower = min(eigvals(1:end,j)) - range(eigvals(1:end,j))*0.05;
+%         ylim([ylower yupper])
+%         eval_ID = ['Eigenvalue ',num2str(j)];
+%         title(eval_ID,'fontSize',14,'FontName','Helvitica')
+%         hold on
+%         plot([0 16],[0 0],'k:')
+%         hold off
+%     end
+%     % Plot the eigenvectors in middle column (subplots 2,5,8,11,14,17)
+%     for j = eig_first:eig_last
+%         subplot(6,3,(3*j)-(3*eig_first)+2)
+%         plot(T/3600, eigvecs(:,j));
+%         xlim([0 16])
+%         yupper = max(eigvecs(1:end,j)) + range(eigvecs(1:end,j))*0.05;
+%         ylower = min(eigvecs(1:end,j)) - range(eigvecs(1:end,j))*0.05;
+%         ylim([ylower yupper])
+%         set(gca,'YGrid','on')
+%         set(gca,'YMinorGrid','on')
+%         evec_ID = ['Eigenvector ',num2str(j)];
+%         title(evec_ID,'fontSize',14,'FontName','Helvitica')
+%     end
+%     % Plot the eigenvector identities in right column (subplots 3,6,9,12,15,18)
+%     for j = eig_first:eig_last
+%         subplot(6,3,(3*j)-(3*eig_first)+3)
+%         plot(T/3600, eigvecIDs(:,j));
+%         xlim([0 16])
+%         ylim([0 42])
+%         set(gca,'YGrid','on')
+%         set(gca,'YMinorGrid','on')
+%         evec_ID = ['Eigenvector ',num2str(j),' Identities'];
+%         title(evec_ID,'fontSize',14,'FontName','Helvitica')
+%     end
+% end
+
+% Plots of positive eigenvalues (first three)
+figure(12)
+eig_first = 1; eig_last = 3;
+% Plot the eigenvalues in left column (subplots 1,4,7)
+for j = eig_first:eig_last
+    subplot(3,3,(3*j)-(3*eig_first)+1)
+    splitcolorplot(T/3600, eigvals(:,j),'g','k')
+    xlim([0 8])
+    yupper = max(eigvals(1:end,j)) + range(eigvals(1:end,j))*0.05;
+    ylower = min(eigvals(1:end,j)) - range(eigvals(1:end,j))*0.05;
+    ylim([ylower yupper])
+    eval_ID = ['Eigenvalue ',num2str(j)];
+    title(eval_ID,'fontSize',14,'FontName','Helvitica')
+    hold on
+    plot([0 8],[0 0],'k:')
+    hold off
+end
+% Plot the eigenvectors in middle column (subplots 2,5,8)
+for j = eig_first:eig_last
+    subplot(3,3,(3*j)-(3*eig_first)+2)
+    plot(T/3600, eigvecs(:,j));
+    xlim([0 8])
+    yupper = max(eigvecs(1:end,j)) + range(eigvecs(1:end,j))*0.05;
+    ylower = min(eigvecs(1:end,j)) - range(eigvecs(1:end,j))*0.05;
+    ylim([ylower yupper])
+    evec_ID = ['Eigenvector ',num2str(j)];
+    title(evec_ID,'fontSize',14,'FontName','Helvitica')
+end
+% Plot the eigenvector IDs in right column (subplots 3,6,9)
+for j = eig_first:eig_last
+    subplot(3,3,(3*j)-(3*eig_first)+3)
+    plot(T/3600, eigvecIDs(:,j));
+    xlim([0 8])
+    ylim([0 42])
+    set(gca,'YGrid','on')
+    evec_ID = ['Eigenvector ',num2str(j),' Identities'];
+    title(evec_ID,'fontSize',14,'FontName','Helvitica')
+end
+
+% Formatting
+for i = 4
+    figure(i)
+    for ii = 1:2
+        subplot(1,2,ii)
+        set(findobj(gcf,'type','line'),'LineWidth',1,'LineSmoothing','on');
+    end
+end
+% for i = 5:10
+%     figure(i)
+%     for ii = 1:18
+%         subplot(6,3,ii)
+%         set(findobj(gcf,'type','line'),'LineWidth',1,'LineSmoothing','on');
+%     end
+% end
+for i = 12
+    figure(i)
+    for ii = 1:9
+        subplot(3,3,ii)
+        set(findobj(gcf,'type','line'),'LineWidth',1,'LineSmoothing','on');
+    end
+end
