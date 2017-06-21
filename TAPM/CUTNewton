@@ -1,0 +1,105 @@
+clear all
+
+CUTeiganal;                         % Run this first so all variables are defined
+
+Ypert = 0.000001*randn(1,24)        % Start with random values for Yp to see if it converged to a steady state
+eps = 1e-8;                         % eps used in Jacobian calculation
+carry = 38200;                      % Carrying capacity from Logistic Model
+temp = zeros(1,24);                 % Temporary vector template
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % 3RD LOOP: How does changing carry affect species of interest? (at bottom)
+% spaces = 200;                       % Number of spaces for linspace below
+% var = linspace(200,carry,spaces);   % Evenly spaced vector between 200 and 'carry' with 'spaces' number of spaces
+% for itp = 1:length(var)             % New loop to cycle the whole thing over the number of points in var...
+%     carry = var(itp);               % ...and update carry as it progresses - shows how species changes as carry changes
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % 2ND LOOP: ITERATING UNTIL CONVERGENCE
+    for itk = 1:200               % iterations for steady state progression to converge within
+        temp = Ypert;             % assign YPert to the temporary vector
+        fx = CUTdegrhsVRoff(T(p), temp', k,kr,kc,s,r,v,carry);
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+        % 1ST LOOP: CALCULATE JACOBIAN
+        for q = 1:length(IC)              % Iterate through species
+            vk = zeros(1,length(IC));     % set up vk vector...
+            vk(q) = eps;                  % ...as eps
+            % size(vk) size(temp)         % Check vk and temp are of equal size to avoid errors
+                                          % This is why you can't just input eps instead of vk below
+                                          % (needs to be a vector of eps's equal in size to temp)
+            % Compute the Jacobian using the kth row equation in CUTeiganal where f = CUTdegrhsVRoff() and x = Y()
+            J(:,q) = (CUTdegrhsVRoff(0, (temp + vk)', k,kr,kc,s,r,v,carry) - CUTdegrhsVRoff(0, temp', k,kr,kc,s,r,v,carry))/eps;
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % 2ND LOOP (continued)
+        % Computes the small change in Yp
+        dYpert = - (J + eps*eye(length(IC)))\fx; % \ is left matrix divide
+        % size(Ypert) size(dYpert)        % Check Ypert and dYpert are of equal size to avoid errors
+        Ypert = Ypert + dYpert';        % Updates Ypert with the small change dYpert
+        
+        if norm(dYpert) < 1e-10
+            display('Number of iterations converged within:')
+            itk
+            break           % Stops the computation once it converges to steady state
+        end
+        % temp-IC'            % Check if there have been changes by the end by subtracting the initial conditions from temp
+        % temp(1)             % Check tBid is non-zero so the bogus zero steady state isn't the one we're looking at
+    end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     % 3RD LOOP (continued)
+%     species(itp) = temp(22)    % choose the species of interest: tBid=1, CytoC=21, Smac=22
+% end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% return % comment to view steady state values
+
+ysteady = Y(end,:)          % shows steady state values
+ychange = ysteady-IC'       % shows how much each species changed from the start to the steady state
+
+log_ysteady = log(ysteady);
+
+for i = 1:length(ysteady)
+    if ysteady(i)> 1
+        log_ysteady(i) = log(ysteady(i));
+    else
+        log_ysteady(i) = 0;
+    end
+end
+
+for i = 1:length(ychange)
+    if ychange(i)> 0
+        log_ychange(i) = log(ychange(i));
+    elseif ychange(i)< 0
+        log_ychange(i) = -log(abs(ychange(i)));
+    else
+        log_ychange(i) = 0;
+    end
+end
+
+ychangeSummary = zeros(1,11);
+ychangeSummary(1)  = ychange(1); % tBID
+ychangeSummary(2)  = ychange(4); % Inactive BAX
+ychangeSummary(3)  = ychange(6); % Active BAX
+ychangeSummary(4)  = ychange(7) + 2*ychange(10) + 4*ychange(12) + 4*ychange(16); % Total uninhibited mitochondria-associated BAX molecules (all forms)
+ychangeSummary(5)  = ychange(16); % Only BAX molecules in active mitochondrial pore
+ychangeSummary(6)  = ychange(8); % Bcl-2
+ychangeSummary(7)  = ychange(9) + 2*ychange(11) + 4*ychange(13); % Bcl-2-inhibited BAX molecules (all forms)
+ychangeSummary(8)  = ychange(17); % mitochondrial cytochrome c
+ychangeSummary(9)  = ychange(23); % cytosolic cytochrome c
+ychangeSummary(10) = ychange(20); % mitochondrial SMAC
+ychangeSummary(11) = ychange(24); % cytosolic SMAC
+
+for i = 1:length(ychangeSummary)
+    if ychangeSummary(i)> 0
+        log_ychangeSummary(i) = log(ychangeSummary(i));
+    elseif ychangeSummary(i)< 0
+        log_ychangeSummary(i) = -log(abs(ychangeSummary(i)));
+    else
+        log_ychangeSummary(i) = 0;
+    end
+end
+
+figure(5)
+bar(log_ychangeSummary)
+
+% See CUTsteady_fig for figure
