@@ -1,0 +1,83 @@
+%% %%%%%%%%%%%%%%%%%        RUN THIS SCRIPT          %%%%%%%%%%%%%%%%%%%%%%
+%
+% Runs the other files first
+initials;
+rates;
+
+%% Set the species that change depending on cell type
+% overwrites ICs from file: initials_hct116_2.m
+
+IC(12)=pC3;  IC(15)=pC6;  IC(19)=XIAP; IC(21)=PARP; IC(24)=Bid;
+
+%% Fine-tuning
+
+s=1*s;
+r=1*r;
+r(14)=5*r(14);          % increases degredation rate for C3* x5 (see degrhsVRoff.m for reference)
+s(2)=r(2)*IC(2);        % ligand synthesis rate
+s(7)=r(7)*IC(7);        % pC8 synthesis rate
+s(33)=r(33)*IC(33);     % Bcl2 synthesis rate
+t=[2 4 6 8 12]*60*60;   % time intervals
+tf = 12*3600;           % max time
+samp_freq=tf/60;        % sampling frequency
+dt=(tf-0)/samp_freq;
+
+% set the option parameters for the ODE file: 'degrhsVRoff.m'
+options=odeset('AbsTol',1E-10,'RelTol',1E-8,'maxstep',dt);
+
+return % comment out if you want the figures
+
+%% Construct the figures
+% 
+
+figure(1);
+
+% Wild Type HCT116 cell
+IC(12)=pC3;                     % pC3 level (only changes with cell type) 
+IC(19)=XIAP;                    % Normal XIAP level
+IC(33)=Bcl2;                    % Normal Bcl2 level
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(2,2,1), plot(T/3600,(1e6-Y(:,21))./1e6)
+title('WT HCT116')
+xlim([0 12])
+ylim([0 1])
+ylabel('Proportion cPARP')
+
+% HCT116 cell with over-expressed Bcl2
+IC(12)=pC3;                     % pC3 level (only changes with cell type) 
+IC(19)=XIAP;                    % Normal XIAP level
+IC(33)=10*Bcl2;                 % Over-expressed Bcl2
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(2,2,2), plot(T/3600,(1e6-Y(:,21))./1e6)
+title('OE-Bcl2 HCT116')
+xlim([0 12])
+ylim([0 1])
+
+% Wild Type HCT116 cell without XIAP
+IC(12)=pC3;                     % pC3 level (only changes with cell type) 
+IC(19)=0;                       % Normal XIAP level
+IC(33)=Bcl2;                    % Normal Bcl2 level
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(2,2,3), plot(T/3600,(1e6-Y(:,21))./1e6)
+title('No-XIAP HCT116')
+xlim([0 12])
+xlabel('Time (hrs)')
+ylim([0 1])
+ylabel('Proportion cPARP')
+
+
+% HCT116 cell without XIAP and with over-expressed Bcl2
+IC(12)=pC3;                     % pC3 level (only changes with cell type) 
+IC(19)=0;                       % Normal XIAP level
+IC(33)=10*Bcl2;                 % Over-expressed Bcl2
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(2,2,4), plot(T/3600,(1e6-Y(:,21))./1e6)
+title('OE-Bcl2/No-XIAP HCT116')
+xlim([0 12])
+xlabel('Time (hrs)')
+ylim([0 1])
+
+for i = 1
+    figure(i)
+    set(findobj(gcf,'type','line'),'LineWidth',1.5,'LineSmoothing','on');
+end
