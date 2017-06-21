@@ -1,0 +1,29 @@
+%% %%%%%%%%%%%%%%%%%        RUN THIS SCRIPT          %%%%%%%%%%%%%%%%%%%%%%
+%
+% This is for a generic cell type since the parameters that change
+% depending on cell type are cut out of this model anyway.
+
+
+% Runs the other files first
+CUTinitials;
+CUTrates;
+
+%% Fine-tuning
+
+s=1*s;
+r=1*r;
+s(8)=r(8)*IC(8);     % Bcl2 synthesis rate
+t=[2 4 6 8 12]*60*60;   % time intervals
+tf = 12*3600;           % max time
+samp_freq=tf/60;        % sampling frequency
+dt=(tf-0)/samp_freq;
+
+% set the option parameters for the ODE file: 'CUTdegrhsVRoff.m'
+options=odeset('AbsTol',1E-3,'RelTol',1E-8,'maxstep',dt);
+
+%% Logistic Model
+
+syn_scale = 1.0E2;      % increasing this hastens the onset of MOMP
+carry = 3.82E4;         % from checking the levelling point in FAPM - default = 3.82E4
+IC(1) = 1; % begins from the 1st molecule produced
+s(1) = r(1).*IC(1)*syn_scale;  % see how s is calculated above (included scale factor)
