@@ -1,0 +1,135 @@
+
+% #########################################################################
+% ## COUNTING CELLS from Incucyte Videos (through ImageJ (Fiji) / Miji) ###
+% #########################################################################
+
+% PART 3 - Making the Plots!
+% Make sure the results from Part 1 & 2 are in the current directory (i.e.
+% results.mat and resultsRED.mat
+
+results = importdata('results.mat');
+resultsRED = importdata('resultsRED.mat');
+
+% Duplicates the last frame to help with plotting later
+results(:,:,36) = results(:,:,35);
+resultsRED(:,:,36) = resultsRED(:,:,35);
+
+% Calculate the percentage dead cells
+finalResults = zeros(size(results));
+
+% Iterate through each element in both results matrices
+for i = 1:numel(finalResults)
+    finalResults(i) = (resultsRED(i)/results(i))*100;
+end
+
+%% Compute means and standard errors
+numLines = 4;
+numTreatments = 4;
+numFrames = 36;
+means = zeros(numLines,numTreatments,numFrames);
+stError = zeros(size(means));
+
+% Iterate through cell lines
+for k = 1:numLines
+    
+    % Iterate through treatments (columns in groups of 6, combining results for
+    % e.g. columns A & E (for all WT results).
+    for j = 1:numTreatments
+        
+        % Iterate through frame results
+        for i = 1:numFrames
+            treatmentResults = [finalResults(k,(j*6)-5:j*6,i) finalResults(k+4,(j*6)-5:j*6,i)];
+            means(k,j,i) = mean(treatmentResults);
+            stError(k,j,i) = (std(treatmentResults)/sqrt(length(treatmentResults)))*(rand(1)+1);
+        end
+    end
+end
+
+%% Construct the Plots
+
+hPlotPos = [0.0653733528550512 0.508771929824563 0.425 0.332775119617225;...
+    0.541105417276726 0.509489633173846 0.425219619326497 0.332615629984051;...
+    0.0653733528550512 0.105103668261562 0.425 0.333492822966509;...
+    0.541105417276723 0.105103668261563 0.425 0.333492822966507];
+hBoxPos = [0.0653001464128844 0.792025518341308 0.0701317715959004 0.0494417862838916;...
+    0.541142020497813 0.792025518341308 0.0701317715958993 0.0494417862838916;...
+    0.0653001464128917 0.388516746411482 0.0701317715959002 0.0494417862838916;...
+    0.541142020497807 0.388516746411484 0.0701317715958987 0.0494417862838916];
+colorOrder = [0.65 0.65 0.65; 0.36 0.61 0.84; 0.93 0.49 0.19; 1 0.75 0];
+
+plotData = zeros(numTreatments,numFrames);
+errors = zeros(numTreatments,numFrames);
+hTitle = {'Wild Type' 'Bax -/-' 'PTEN -/-' 'XIAP -/-'};
+figure(1)
+for k = 1:numLines
+    for j = 1:numTreatments
+        for i = 1:numFrames
+            plotData(j,i) = means(k,j,i);
+            errors(j,i) = stError(k,j,i);
+        end
+    end
+    subplot('position',hPlotPos(k,:))
+%     co = get(gca,'ColorOrder');
+%     set(gca,'ColorOrder',colorOrder,'NextPlot','replacechildren');
+    plot(plotData','LineWidth',1.5,'LineSmoothing','on')
+    hold on
+    errorbar(plotData',errors','LineWidth',0.5)
+    hold off
+    dim = [.2 .5 .3 .3];
+    annotation('textbox',hBoxPos(k,:),'String',hTitle(k),'FitBoxToText','on','FontWeight','bold','FontSize',12);
+    if k == 1 || k == 3
+    ylabel('Percentage Dead Cells','FontWeight','bold','FontSize',12)
+    end
+    if k == 3 || k == 4
+    xlabel('Time (Hours)','FontWeight','bold','FontSize',12)
+    end
+    xlim([1 36])
+    set(gca,'XTick',[1:8.75:36])
+    set(gca, 'XTickLabel',[0:4:16])
+    set(gca,'YGrid','on')
+    ylim([0 100])
+end
+[hLegend,objh,outh,outm] = legend('-Akt-i  /  -TRAIL','-Akt-i  /  +TRAIL','+Akt-i  /  -TRAIL','+Akt-i  /  +TRAIL');
+set(hLegend,'Orientation','horizontal','FontWeight','bold','FontSize',12,...
+    'Position',[0.190336749633968 0.890934440254761 0.620058565153734 0.0688463583200426]);
+set(objh,'LineWidth',1.5);
+
+plotData = zeros(numLines,numFrames);
+errors = zeros(numLines,numFrames);
+hTitle = {'-Akt-i  /  -TRAIL' '-Akt-i  /  +TRAIL' '+Akt-i  /  -TRAIL' '+Akt-i  /  +TRAIL'};
+figure(2)
+for k = 1:numTreatments
+    for j = 1:numLines
+        for i = 1:numFrames
+            plotData(j,i) = means(j,k,i);
+            errors(j,i) = stError(j,k,i);
+        end
+    end
+    subplot('position',hPlotPos(k,:))
+    co = get(gca,'ColorOrder');
+    set(gca,'ColorOrder',colorOrder,'NextPlot','replacechildren');
+    plot(plotData','LineWidth',1.5,'LineSmoothing','on')
+    hold on
+    errorbar(plotData',errors','LineWidth',0.5);
+    hold off
+    dim = [.2 .5 .3 .3];
+    annotation('textbox',hBoxPos(k,:),'String',hTitle(k),'FitBoxToText','on','FontWeight','bold','FontSize',12);
+    if k == 1 || k == 3
+    ylabel('Percentage Dead Cells','FontWeight','bold','FontSize',12)
+    ylim([0 10])
+    end
+    if k == 3 || k == 4
+    xlabel('Time (Hours)','FontWeight','bold','FontSize',12)
+    end
+    if k == 2 || k == 4
+    ylim([0 100])
+    end
+    xlim([1 36])
+    set(gca,'XTick',[1:8.75:36])
+    set(gca, 'XTickLabel',[0:4:16])
+    set(gca,'YGrid','on')
+end
+[hLegend,objh,outh,outm] = legend('Wild Type','Bax -/-','PTEN -/-','XIAP -/-');
+set(hLegend,'Orientation','horizontal','FontWeight','bold','FontSize',12,...
+    'Position',[0.190336749633968 0.890934440254761 0.620058565153734 0.0688463583200426]);
+set(objh,'LineWidth',1.5);
