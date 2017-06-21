@@ -1,0 +1,117 @@
+%% Reaction Definitions and corresponding rates (Aldridge et al. 2011)%%%%%
+% k() denotes forward reaction / kr() is reverse / kc() is catalytic / %%%%
+% C8* is active form of pC8 / <-> is a reversible reaction %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% TRAIL  + pC8            <-> TRAIL:pC8      -> C8*                      k(1),  kr(1),  kc(1)
+% C8*    + pC3            <-> C8*:pC3        -> C8*         + C3*        k(2),  kr(2),  kc(2)
+% C3*    + pC8            <-> C3*:pC8        -> C3*         + C8*        k(3),  kr(3),  kc(3)
+% C8*    + Bax            <-> C8*:Bax        -> C8*         + Bax*       k(4),  kr(4),  kc(4)
+% Bax*_m + Mito           <-> Mito*                                      k(5),  kr(5)
+% Mito*  + Cytoc_m        <-> Mito*:Cytoc_m  -> Mito*       + Cytoc      k(6),  kr(6),  kc(6)
+% Mito*  + Smac_m         <-> Mito*:Smac_m   -> Mito*       + Smac       k(7),  kr(7),  kc(7)
+% Mito*                    -> Mito                                       k(8)
+% Cytoc  + pC3            <-> Cytoc:pC3      -> Cytoc       + C3*        k(9),  kr(9),  kc(9)
+% PTEN   + Akt*           <-> PTEN:Akt*      -> PTEN        + Akt        k(10), kr(10), kc(10)
+% Akt*   + Cytoc          <-> Akt*:Cytoc                                 k(11), kr(11)
+% Bcl2   + Bax*_m         <-> Bcl2:Bax*_m                                k(12), kr(12)
+% Smac   + XIAP           <-> Smac:XIAP                                  k(13), kr(13)
+% Akt                     <-> Akt*                                       k(14), kr(14)
+% Akt*   + Bax*           <-> Akt*:Bax*                                  k(15), kr(15)
+% OBSOLETE (removed)                                                     k(16), kr(16)
+% Smac   + XIAP    + Akt* <-> Smac:XIAP:Akt* -> Smac:XIAP   + Akt        k(17), kr(17), kc(17)
+% Akt*   + XIAP           <-> Akt*:XIAP      -> Akt         + XIAP       k(18), kr(18), kc(18) *additional factor of degradation reduction in k(23)
+% C3*    + XIAP           <-> C3*:XIAP       -> C3*_Ub      + XIAP       k(19), kr(19), kc(19)
+% PTEN   + XIAP           <-> PTEN:XIAP      -> PTEN_Ub     + XIAP       k(20), kr(20), kc(20)
+% Bax*                    <-> Bax*_m                                     k(21), kr(21)
+% C3*   + PARP            <-> C3*:PARP       -> C3*         + cPARP      k(22), kr(22), kc(22)
+% XIAP  + Cytoc           <-> XIAP:Cytoc                                 k(23), kr(23)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% TRAIL  + pC8            <-> TRAIL:pC8      -> C8*                      
+k(1)=1E-7; kr(1)=1E-3; kc(1)=1; % or kc(1)=5E-5;
+
+% C8*    + pC3            <-> C8*:pC3        -> C8*         + C3*        
+k(2)=1E-6; kr(2)=1E-3; kc(2)=1;
+
+% C3*    + pC8            <-> C3*:pC8        -> C3*         + C8*        
+k(3)=3E-8; kr(3)=1E-3; kc(3)=1;
+
+% C8*    + Bax            <-> C8*:Bax        -> C8*         + Bax*       
+k(4)=1E-7; kr(4)=1E-3; kc(4)=1;
+
+% Bax*_m + Mito           <-> Mito*                                      
+k(5)=1E-6; kr(5)=1E-3;
+
+% Mito*  + Cytoc_m        <-> Mito*:Cytoc_m  -> Mito*       + Cytoc      
+k(6)=2E-6; kr(6)=1E-3; kc(6)=.01/v;
+
+% Mito*  + Smac_m         <-> Mito*:Smac_m   -> Mito*       + Smac       
+k(7)=2E-6; kr(7)=1E-3; kc(7)=.01/v;
+
+% Mito*                    -> Mito                                      
+k(8)=1E-4;
+
+% Cytoc  + pC3            <-> Cytoc:pC3      -> Cytoc       + C3*       
+k(9)=5E-9; kr(9)=1E-3; kc(9)=1;
+
+% PTEN   + Akt*           <-> PTEN:Akt*      -> PTEN        + Akt   
+% k(10)=5E-8; kr(10)=1E-3; kc(10)=1;
+k(10)=1E-8; kr(10)=2E-4; kc(10)=1;
+
+% Akt*   + Cytoc          <-> Akt*:Cytoc                                
+k(11)=1E-9; kr(11)=1E-3;
+
+% Bcl2   + Bax*_m         <-> Bcl2:Bax*_m                             
+k(12)=1E-6; kr(12)=1E-3;
+
+% Smac   + XIAP           <-> Smac:XIAP                            
+k(13)=3.5E-6; kr(13)=1E-3;
+
+% Akt                     <-> Akt*                                   
+k(14)=1E-3; kr(14)=1E-6;
+
+% Akt*   + Bax*           <-> Akt*:Bax*                                 
+k(15)=1E-6; kr(15)=1E-3;
+
+% OBSOLETE:
+% k(16) = 0; kr(16) = 0;
+
+% Smac   + XIAP    + Akt* <-> Smac:XIAP:Akt* -> Smac:XIAP   + Akt     
+k(17)=3.5E-6; kr(17)=1E-3; kc(17)=1;
+
+% Akt*   + XIAP           <-> Akt*:XIAP      -> Akt         + XIAP 
+k(18)=1E-9; kr(18)=1E-3; kc(18)=1;
+
+% C3*    + XIAP           <-> C3*:XIAP       -> C3*_Ub      + XIAP                               
+k(19)=7e-5; kr(19)=1.67e-5; kc(19)=1.67e-4;
+
+% PTEN   + XIAP           <-> PTEN:XIAP      -> PTEN_Ub     + XIAP
+% k(20)=1e-9; kr(20)=1.67e-5; kc(20)=1.67e-4;
+k(20)=1e-8; kr(20)=1.67e-3; kc(20)=1.67e-2;
+
+% Bax*                    <-> Bax*_m                                   
+k(21)=0.01; kr(21)=0.01/v;
+
+% C3*   + PARP            <-> C3*:PARP       -> C3*         + cPARP     
+k(22)=1E-7; kr(22)=1E-3; kc(22)=1;
+
+% XIAP  + Cytoc           <-> XIAP:Cytoc   
+k(23)=1E-3; kr(23)=1E-3;
+
+
+%% Assign degredation rates
+r = ones(41,1).*(1/2)*(1/24)*(1/3600);    % = 5.8E-6 degradation rates for all species (deg rate for Mito* covered by k(8)
+r(5) = 5*r(5);          % increases degredation rate for C3* x5 (see original degrhsVRoff.m for reference)
+
+%% Assign the synthesis rates
+s = zeros(41,1); % synthesis rates... s(1) should always = 0
+for i=[2,4,6,8,10,12,14,15,18,20,24]
+  s(i)=r(i).*IC(i); % function of degredation rates and initial conditions
+end
+s(1)=0;
+
+k = k*(3/5);
+kr = kr*(3/5);
+kc = kc*(3/5);
