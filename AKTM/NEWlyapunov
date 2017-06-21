@@ -1,0 +1,153 @@
+%% Lyapunov Exponent Analysis
+
+clear all
+
+NEWintegrate_DLE;
+
+[T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 12]*3600,IC,options);
+
+eps = 0.1;
+
+M = zeros(length(T),length(IC),length(IC));
+% Iterate through each species
+for j = 1:length(IC)
+    
+    % Reset vk vector to zeros for each iteration
+    vk = zeros(size(IC));
+    
+    % Assign the eps perturbation to a different species each time
+    vk(j) = eps;
+    
+    % Calculate Y so that Y(t) = [Psi_1(t),Psi_2(t),...,Psi_n(t)]
+    % where Psi_1(t) = X_1(t) - X*(t)
+    %                = Perturbed solution - Original solution
+    [Tp Xp]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 12]*3600,IC+vk,options);
+    M(:,:,j) = (interp1(Tp, Xp, T) - Y)/eps;
+    j
+end
+
+% Iterate through each time step
+for i = 1:length(T)
+    
+    %     [evec, eval] = eig(squeeze(M(i,:,:)));
+    %     [exm, evi] = max(real(diag(eval)));
+    %     [eigvec(i,:), eigvecid(i,:)] = sort(abs(evec(:,evi)),'descend');
+    
+    % Calculate Lyapunov Exponents
+    [L(i,:),Lid(i,:)] = sort(log(abs(eig(squeeze(M(i,:,:)))))/T(i),1,'descend');
+    
+end
+
+%% Lyapunov Figures
+
+for i = 4:9
+    figure(i);
+    % Define the range of exponents for each figure (i.e. 1-6, 7-13, etc.)
+    exp_first = 6*(i-4)+1; exp_last = 6*(i-4)+6;
+    
+    % Plot the exponents in left column (subplots 1,3,5,7,9,11)
+    for j = exp_first:exp_last
+        subplot(6,2,(2*j)-(2*exp_first)+1)
+        splitcolorplot(T/3600, L(:,j),'g','k')
+        yupper = max(L(2:end,j)) + range(L(2:end,j))*0.05; % 2:end used since element #1 = NAN
+        ylower = min(L(2:end,j)) - range(L(2:end,j))*0.05;
+        ylim([ylower yupper])
+        spec_ID = ['Exponent ',num2str(j)];
+        title(spec_ID,'fontSize',13,'FontName','Helvitica')
+        hold on
+        plot([0 12],[0 0],'k:')
+        hold off
+    end
+    % Plot the exponent IDs in right column (subplots 2,4,6,8,10,12)
+    for j = exp_first:exp_last
+        subplot(6,2,(2*j)-(2*exp_first)+2)
+        plot(T/3600, Lid(:,j));
+        ylim([0 42])
+        set(gca,'YGrid','on')
+        set(gca,'YMinorGrid','on')
+    end
+end
+
+
+figure(10);
+for j = 37:41
+    subplot(5,2,(2*j)-73), splitcolorplot(T/3600, L(:,j),'g','r');
+    yupper = max(L(2:end,j)) + range(L(2:end,j))*0.05; % 2:end used since element #1 = NAN
+    ylower = min(L(2:end,j)) - range(L(2:end,j))*0.05;
+    ylim([ylower yupper])
+    spec_ID = ['Exponent ',num2str(j)];
+    title(spec_ID)
+    hold on
+    plot([0 12],[0 0],'k:')
+    hold off
+end
+for j = 37:41
+    subplot(5,2,(2*j)-72), plot(T/3600, Lid(:,j));
+    ylim([0 42])
+    set(gca,'YGrid','on')
+    set(gca,'YMinorGrid','on')
+end
+
+figure(11);
+subplot(2,1,1), plot(T/3600, L(:,:));
+ylim([-0.002 0.001])
+hold on
+plot([0 12],[0 0],'k:')
+hold off
+title('All Lyapunov Exponents','fontSize',13,'FontName','Helvitica')
+ylabel({'Lyapunov';'Exponents'},'fontSize',14,'FontName','Helvitica')
+subplot(2,1,2), plot(T/3600, Lid(:,:));
+ylim([0 42])
+set(gca,'YGrid','on')
+set(gca,'YMinorGrid','on')
+title('All Lyapunov Exponent Identities','fontSize',13,'FontName','Helvitica')
+xlabel('Hours post-TRAIL treatment','fontSize',14,'FontName','Helvitica')
+ylabel({'Exponent';'Identities'},'fontSize',14,'FontName','Helvitica')
+
+
+
+%% Formatting
+
+for i = 4:9
+    figure(i)
+    for i = 1:12
+        subplot(6,2,i)
+        set(findobj(gcf,'type','line'),'LineWidth',0.8,'LineSmoothing','on');
+    end
+    for i = [1 3 5 7 9 11]
+        subplot(6,2,i)
+        ylabel({'Lyapunov';'Exponent'},'fontSize',14,'FontName','Helvitica');
+    end
+    for i = [2 4 6 8 10 12]
+        subplot(6,2,i)
+        ylabel({'Exponent';'Identities'},'fontSize',14,'FontName','Helvitica');
+    end
+    for i = 11:12
+        subplot(6,2,i)
+        xlabel('Hours post-TRAIL treatment','fontSize',14,'FontName','Helvitica');
+    end
+end
+
+for i = 10
+    figure(i)
+    for i = 1:10
+        subplot(5,2,i)
+        set(findobj(gcf,'type','line'),'LineWidth',0.8,'LineSmoothing','on');
+    end
+    for i = [1 3 5 7 9]
+        subplot(5,2,i)
+        ylabel({'Lyapunov';'Exponent'},'fontSize',14,'FontName','Helvitica');
+    end
+    for i = [2 4 6 8 10]
+        subplot(5,2,i)
+        ylabel({'Exponent';'Identities'},'fontSize',14,'FontName','Helvitica');
+    end
+    for i = 9:10
+        subplot(5,2,i)
+        xlabel('Hours post-TRAIL treatment','fontSize',14,'FontName','Helvitica');
+    end
+end
+return
+figure(12);
+NEW = imread('Simplified - WT.png');
+imshow(NEW)
