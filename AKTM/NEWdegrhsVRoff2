@@ -1,0 +1,165 @@
+function xp=NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v)
+% NEWdegrhsVRoff2 takes initial conditions and rate constants as inputs, and outputs
+% protein concentrations for all proteins in the system, based on their ODEs listed below.
+
+% Note that 'x' here refers to the 'IC' vector set up.
+xp = double(x);
+
+
+% TRAIL
+xp(1) = -k(1)*x(1)*x(2) +kr(1)*x(26) +s(1) -r(1)*x(1);
+
+% pC8
+xp(2) = -k(1)*x(1)*x(2) +kr(1)*x(26) -k(3)*x(5)*x(2) +kr(3)*x(28) +...
+    +s(2) -r(2)*x(2);
+
+% C8*
+xp(3) = +kc(1)*x(26) -k(2)*x(3)*x(4) +kr(2)*x(27) +kc(2)*x(27) +...
+    +kc(3)*x(28) -k(4)*x(3)*x(6) +kr(4)*x(29) +kc(4)*x(29) -r(3)*x(3);
+
+% pC3
+xp(4) = -k(2)*x(3)*x(4) +kr(2)*x(27) -k(9)*x(11)*x(4) +kr(9)*x(32) +...
+    +s(4) -r(4)*x(4);
+
+% C3*
+xp(5) = +kc(2)*x(27) -k(3)*x(5)*x(2) +kr(3)*x(28) +kc(3)*x(28) +...
+    +kc(9)*x(32) -k(19)*x(5)*x(20) +kr(19)*x(37) -k(22)*x(5)*x(24) +...
+    +kr(22)*x(35) +kc(22)*x(35) -r(5)*x(5);
+
+% Bax
+xp(6) = -k(4)*x(3)*x(6) +kr(4)*x(29) +s(6) -r(6)*x(6);
+
+% Bax* % k(21) is Bax* conversion to mitochondrial Bax*_m
+xp(7) = +kc(4)*x(29) -k(15)*x(16)*x(7) +kr(15)*x(23) -k(21)*x(7) +...
+    +kr(21)*x(22) -r(7)*x(7);
+
+% Mito % mitochondrial vol. ~7% < cytosolic vol.
+       % have to +k(8)*x(Mito*) to include Mito* -> Mito degradation
+xp(8) = -((1/v)^2)*k(5)*x(22)*x(8) +kr(5)*x(9) +k(8)*x(9) +s(8) -r(8)*x(8);
+
+% Mito* % k(6) reactions for Mito* balance out; k(7) too.
+        % k(8)*x(9) acts as Mito*'s only degradation, instead of r(41)*x(41) in original
+xp(9) = +((1/v)^2)*k(5)*x(22)*x(8) -kr(5)*x(9) +...
+    -((1/v)^2)*k(6)*x(9)*x(10) +kr(6)*x(30) +kc(6)*x(30) +...
+    -((1/v)^2)*k(7)*x(9)*x(12) +kr(7)*x(31) +kc(6)*x(31) -k(8)*x(9);
+
+% Cytoc_m
+xp(10) = -((1/v)^2)*k(6)*x(9)*x(10) +kr(6)*x(30) +...
+    +s(10) -r(10)*x(10);
+
+% Cytoc
+xp(11) = +kc(6)*x(30) -k(9)*x(11)*x(4) +kr(9)*x(32) +kc(9)*x(32) +...
+    -k(11)*x(16)*x(11) +kr(11)*x(17) -k(23)*x(20)*x(11) +kr(23)*x(41) +...
+    -r(11)*x(11);
+
+% Smac_m
+xp(12) = -((1/v)^2)*k(7)*x(9)*x(12) +kr(7)*x(31) +...
+    +s(12) -r(12)*x(12);
+
+% Smac % Akt* enhances Smac affinity for XIAP via k(17)*[Smac]*[XIAP]*[Akt*] so negative rate for Smac here.
+xp(13) = +kc(7)*x(31) -k(13)*x(13)*x(20) +kr(13)*x(21) +...
+    -k(17)*x(13)*x(20)*x(16) +kr(17)*x(34) -r(13)*x(13);
+
+% PTEN
+xp(14) = -k(10)*x(14)*x(16) +kr(10)*x(33) +kc(10)*x(33) +...
+    -k(20)*x(14)*x(20) +kr(20)*x(39) +s(14) -r(14)*x(14);
+
+% Akt % gain in Akt from phosph XIAP is simply kc(18)*[Akt*:XIAP] 
+      % ...note the difference for the effect on XIAP
+      % Akt* enhances Smac affinity for XIAP via kc(17)
+xp(15) = +kc(10)*x(33) -k(14)*x(15) +kr(14)*x(16) +kc(17)*x(34) +...
+    +k(18)*x(36) +s(15) -r(15)*x(15);
+
+% Akt* % loss in Akt* from phosph XIAP via k(18)
+       % Akt* enhances Smac affinity for XIAP via k(17)
+xp(16) = -k(10)*x(14)*x(16) +kr(10)*x(33) -k(11)*x(16)*x(11) +...
+    +kr(11)*x(17) +k(14)*x(15) -kr(14)*x(16) -k(15)*x(16)*x(7) +...
+    +kr(15)*x(23) -k(17)*x(13)*x(20)*x(16) +kr(17)*x(34) +...
+    -k(18)*x(20)*x(16) +kr(18)*x(36) -r(16)*x(16);
+
+% Akt*:Cytoc
+xp(17) = +k(11)*x(16)*x(11) -kr(11)*x(17) -r(17)*x(17);
+
+% Bcl2
+xp(18) = -((1/v)^2)*k(12)*x(18)*x(22) +kr(12)*x(19) +s(18) -r(18)*x(18);
+
+% Bcl2:Bax*_m
+xp(19) = +((1/v)^2)*k(12)*x(18)*x(22) -kr(12)*x(19) -r(19)*x(19);
+
+% XIAP % Akt* enhances Smac affinity for XIAP via k(17)
+       % Akt* minimises XIAP degradation through phosphorylation via
+       % -r(XIAP)*[XIAP]*(k(18)/[Akt*]+1) ... +1 removes Inf errors
+xp(20) = -k(13)*x(13)*x(20) +kr(13)*x(21) -k(17)*x(13)*x(20)*x(16) +...
+    +kr(17)*x(34) -k(18)*x(16)*x(20) +kr(18)*x(36) +kc(18)*x(36) +...
+    -k(19)*x(5)*x(20) +kr(19)*x(37) +kc(19)*x(37) +...
+    -k(20)*x(14)*x(20) +kr(20)*x(39) +kc(20)*x(39) +...
+    -k(23)*x(20)*x(11) +kr(23)*x(41) +...
+    +s(20) -r(20)*x(20)*(1/(x(16)+1));
+
+% Smac:XIAP % Akt* enhances Smac affinity for XIAP via kc(17)
+xp(21) = +k(13)*x(13)*x(20) -kr(13)*x(21) +kc(17)*x(34) -r(21)*x(21);
+
+% Bax*_m % no vol. correction for reverse reaction kr(12) (unimolecular so v-independent)
+         % same for Bax* -> Bax*_m k(21)
+xp(22) = -((1/v)^2)*k(5)*x(22)*x(8) +kr(5)*x(9) +...
+    -((1/v)^2)*k(12)*x(18)*x(22) +kr(12)*x(19) +k(21)*x(7) +...
+    -kr(21)*x(22) -r(22)*x(22);
+
+% Akt*:Bax*
+xp(23) = +k(15)*x(16)*x(7) -kr(15)*x(23) -r(23)*x(23);
+
+% PARP
+xp(24) = -k(22)*x(5)*x(24) +kr(22)*x(35) +s(24) -r(24)*x(24);
+
+% cPARP
+xp(25) = +kc(22)*x(35) -r(25)*x(25);
+
+% TRAIL:pC8
+xp(26) = +k(1)*x(1)*x(2) -kr(1)*x(26) -kc(1)*x(26) -r(26)*x(26);
+
+% C8*:pC3
+xp(27) = +k(2)*x(3)*x(4) -kr(2)*x(27) -kc(2)*x(27) -r(27)*x(27);
+
+% C3*:pC8
+xp(28) = +k(3)*x(5)*x(2) -kr(3)*x(28) -kc(3)*x(28) -r(28)*x(28);
+
+% C8*:Bax
+xp(29) = +k(4)*x(3)*x(6) -kr(4)*x(29) -kc(4)*x(29) -r(29)*x(29);
+
+% Mito*:Cytoc_m
+xp(30) = +((1/v)^2)*k(6)*x(9)*x(10) -kr(6)*x(30) -kc(6)*x(30) -r(30)*x(30);
+
+% Mito*:Smac_m
+xp(31) = +((1/v)^2)*k(7)*x(9)*x(12) -kr(7)*x(31) -kc(6)*x(31) -r(31)*x(31);
+
+% Cytoc:pC3
+xp(32) = +k(9)*x(11)*x(4) -kr(9)*x(32) -kc(9)*x(32) -r(32)*x(32);
+
+% PTEN:Akt*
+xp(33) = +k(10)*x(14)*x(16) -kr(10)*x(33) -kc(10)*x(33) -r(33)*x(33);
+
+% Smac:XIAP:Akt*
+xp(34) = +k(17)*x(13)*x(20)*x(16) -kr(17)*x(34) -kc(17)*x(34) -r(34)*x(34);
+
+% C3*:PARP
+xp(35) = +k(22)*x(5)*x(24) -kr(22)*x(35) -kc(22)*x(35) -r(35)*x(35);
+
+% Akt*:XIAP
+xp(36) = +k(18)*x(16)*x(20) -kr(18)*x(36) -kc(18)*x(36) -r(36)*x(36);
+
+% C3*:XIAP
+xp(37) = +k(19)*x(5)*x(20) -kr(19)*x(37) -kc(19)*x(37) -r(37)*x(37);
+
+% C3*_Ub
+xp(38) = +kc(19)*x(37) -r(38)*x(38);
+
+% PTEN:XIAP
+xp(39) = +k(20)*x(14)*x(20) -kr(20)*x(39) -kc(20)*x(39) -r(39)*x(39);
+
+% PTEN_Ub
+xp(40) = +kc(20)*x(39) -r(40)*x(40);
+
+% XIAP:Cytoc
+xp(41) = +k(23)*x(20)*x(11) -kr(23)*x(41) -r(41)*x(41);
+
+xp=.15*xp;
