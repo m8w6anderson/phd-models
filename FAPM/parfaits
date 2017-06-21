@@ -1,0 +1,635 @@
+%% Plots for each individual parameter (original 18)
+% showing the effect of its removal and over-expression
+
+%% Set 1: Ligand / Receptor / FLIP / pC8 / Bar / pC3 / pC6 / XIAP %%%%%%%%
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure(1);  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,k_,kc,s,r,v);
+subplot(3,3,1), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('Ligand')
+
+hold on
+
+% HCT116 cell with OE-Ligand
+IC(1)=L1000*10;                % Over-expressed Ligand
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,k_,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted Ligand
+IC(1)=L1000*0.05;                    % 95% depleted Ligand
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,k_,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO Ligand
+IC(1)=0;                    % NO Ligand
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO Ligand & no synthesis
+IC(1)=0;    s(1)=0;                    % NO Ligand & no synthesis
+r(1)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,2), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('Receptor')
+
+hold on
+
+% HCT116 cell with OE-Receptor
+IC(2)=10*RWT;                % Over-expressed Receptor
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted Receptor
+IC(2)=RWT*0.05;                    % 95% depleted Receptor
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO Receptor
+IC(2)=0;                    % NO Receptor
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO Receptor & no synthesis
+IC(2)=0;    s(2)=0;                    % NO Receptor & no synthesis
+r(2)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,4), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('FLIP')
+
+hold on
+
+% HCT116 cell with OE-FLIP
+IC(5)=10*flip;                % Over-expressed FLIP
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted FLIP
+IC(5)=flip*0.05;                    % 95% depleted FLIP
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO FLIP
+IC(5)=0;                    % NO FLIP
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO FLIP & no synthesis
+IC(5)=0;    s(5)=0;                    % NO FLIP & no synthesis
+r(5)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,5), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('pC8')
+
+hold on
+
+% HCT116 cell with OE-pC8
+IC(7)=pC8WT*10;                % Over-expressed pC8
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted pC8
+IC(7)=pC8WT*0.05;                    % 95% depleted pC8
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO pC8
+IC(7)=0;                    % NO pC8
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO pC8 & no synthesis
+IC(7)=0;    s(7)=0;                    % NO pC8 & no synthesis
+r(7)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,6), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('Bar')
+
+hold on
+
+% HCT116 cell with OE-Bar
+IC(10)=10*Bar;                % Over-expressed Bar
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted Bar
+IC(10)=Bar*0.05;                    % 95% depleted Bar
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO Bar
+IC(10)=0;                    % NO Bar
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO Bar & no synthesis
+IC(10)=0;    s(10)=0;                    % NO Bar & no synthesis
+r(10)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,7), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('pC3')
+
+hold on
+
+% HCT116 cell with OE-pC3
+IC(12)=10*pC3;                % Over-expressed pC3
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted pC3
+IC(12)=pC3*0.05;                    % 95% depleted pC3
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO pC3
+IC(12)=0;                    % NO pC3
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO pC3 & no synthesis
+IC(12)=0;    s(12)=0;                    % NO pC3 & no synthesis
+r(12)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,8), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('pC6')
+
+hold on
+
+% HCT116 cell with OE-pC6
+IC(15)=pC6*10;                % Over-expressed pC6
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted pC6
+IC(15)=pC6*0.05;                    % 95% depleted pC6
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO pC6
+IC(15)=0;                    % NO pC6
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO pC6 & no synthesis
+IC(15)=0;    s(15)=0;                    % NO pC6 & no synthesis
+r(15)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,9), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('XIAP')
+
+hold on
+
+% HCT116 cell with OE-XIAP
+IC(19)=10*XIAP;                % Over-expressed XIAP
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted XIAP
+IC(19)=XIAP*0.05;                    % 95% depleted XIAP
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO XIAP
+IC(19)=0;                    % NO XIAP
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO XIAP & no synthesis
+IC(19)=0;    s(19)=0;                    % NO XIAP & no synthesis
+r(19)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Set 2: Bid / Bclx / Bax / Bcl2 / M / CytoC / Smac / pC9 / Apaf %%%%%%%%
+figure(2);  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+integrate_DLE; % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,1), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('Bid')
+
+hold on
+
+% HCT116 cell with OE-Bid
+IC(24)=Bid*10;                % Over-expressed Bid
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted Bid
+IC(24)=Bid*0.05;                    % 95% depleted Bid
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO Bid
+IC(24)=0;                    % NO Bid
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO Bid & no synthesis
+IC(24)=0;    s(24)=0;                    % NO Bid & no synthesis
+r(24)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,2), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('Bclx')
+
+hold on
+
+% HCT116 cell with OE-Bclx
+IC(27)=10*Bclx;                % Over-expressed Bclx
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted Bclx
+IC(27)=Bclx*0.05;                    % 95% depleted Bclx
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO Bclx
+IC(27)=0;                    % NO Bclx
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO Bclx & no synthesis
+IC(27)=0;    s(27)=0;                    % NO Bclx & no synthesis
+r(27)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,3), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('Bax')
+
+hold on
+
+% HCT116 cell with OE-Bax
+IC(29)=10*Bax;                % Over-expressed Bax
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted Bax
+IC(29)=Bax*0.05;                    % 95% depleted Bax
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO Bax
+IC(29)=0;                    % NO Bax
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO Bax & no synthesis
+IC(29)=0;    s(29)=0;                    % NO Bax & no synthesis
+r(29)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,4), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('Bcl2')
+
+hold on
+
+% HCT116 cell with OE-Bcl2
+IC(33)=Bcl2*10;                % Over-expressed Bcl2
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted Bcl2
+IC(33)=Bcl2*0.05;                    % 95% depleted Bcl2
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO Bcl2
+IC(33)=0;                    % NO Bcl2
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO Bcl2 & no synthesis
+IC(33)=0;    s(33)=0;                    % NO Bcl2 & no synthesis
+r(33)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,5), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('Mito')
+
+hold on
+
+% HCT116 cell with OE-M
+IC(39)=10*M;                % Over-expressed M
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted M
+IC(39)=M*0.05;                    % 95% depleted M
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO M
+IC(39)=0;                    % NO M
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO M & no synthesis
+IC(39)=0;    s(39)=0;                    % NO M & no synthesis
+r(39)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,6), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('CytoC')
+
+hold on
+
+% HCT116 cell with OE-CytoC
+IC(42)=10*CytoC;                % Over-expressed CytoC
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted CytoC
+IC(42)=CytoC*0.05;                    % 95% depleted CytoC
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO CytoC
+IC(42)=0;                    % NO CytoC
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO CytoC & no synthesis
+IC(42)=0;    s(42)=0;                    % NO CytoC & no synthesis
+r(42)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,7), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('Smac')
+
+hold on
+
+% HCT116 cell with OE-Smac
+IC(45)=Smac*10;                % Over-expressed Smac
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted Smac
+IC(45)=Smac*0.05;                    % 95% depleted Smac
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO Smac
+IC(45)=0;                    % NO Smac
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO Smac & no synthesis
+IC(45)=0;    s(45)=0;                    % NO Smac & no synthesis
+r(45)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE;  % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,8), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('pC9')
+
+hold on
+
+% HCT116 cell with OE-pC9
+IC(52)=10*pC9;                % Over-expressed pC9
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted pC9
+IC(52)=pC9*0.05;                    % 95% depleted pC9
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO pC9
+IC(52)=0;                    % NO pC9
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO pC9 & no synthesis
+IC(52)=0;    s(52)=0;                    % NO pC9 & no synthesis
+r(52)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE; % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+subplot(3,3,9), plot(T/3600,(1e6-Y(:,21))./1e6,'b')
+title('Apaf')
+
+hold on
+
+% HCT116 cell with OE-Apaf
+IC(49)=10*Apaf;                % Over-expressed Apaf
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'g')
+
+% HCT116 cell with 95% depleted Apaf
+IC(49)=Apaf*0.05;                    % 95% depleted Apaf
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'r')
+
+% HCT116 cell with NO Apaf
+IC(49)=0;                    % NO Apaf
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'k')
+
+% HCT116 cell with NO Apaf & no synthesis
+IC(49)=0;    s(49)=0;                    % NO Apaf & no synthesis
+r(49)=0;
+[T Y]=ode15s(@degrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v);
+plot(T/3600,(1e6-Y(:,21))./1e6,'--k')
+
+hold off
+
+integrate_DLE; % Reset Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% %%%%%%%%%%%%%%%% Plot tweaking %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+for i = 1                       % there are 2 figures with 3x3 subplots
+                                % but only 1 with a legend (this one).
+    figure(i)                   % define what you're iterating over.
+    
+    % make the legend
+    legend('Wild Type','Over-expression','95% Depletion',...
+        'Species removal at t0','Removal without synthesis',...
+        'Location',[0.70 0.69 0.19 0.28]);
+    
+    % findall looks for everything in the current figure using gcf and
+    % sets the handle for type 'text' as desired:
+    set(findall(gcf,'type','text'),'fontSize',10,'FontName','Times New Roman');
+    
+    % findobj does the same, but is more specific.
+    % linesmoothing prevents pixelated plot lines.
+    set(findobj(gcf,'type','line'),'LineWidth',1.5,'LineSmoothing','on');
+    
+    for ii = 7:9                % only the bottom row of subplots.
+        subplot(3,3,ii)         % define the nested iteration.
+        xlabh = xlabel('Time (hrs)');    % add the xlabel.
+        
+        % gca = get handle for current axes.
+%         xlabh = get(gca,'Xlabel');  % name the xlabel handle for use below
+        
+        % the 'Position' part can be used to move the axes labels.
+        % other text properties are already defined above so only now need
+        % to change the font weight to bold for the axes labels and the
+        % font itself because labels weren't included above.
+        set(xlabh,'fontweight','b','FontName','Times New Roman','Position',get(xlabh,'Position') - [0 0 0]);
+        
+    end
+    
+    for ii = [1 4 7]                        % only the left subplots.
+        subplot(3,3,ii)                     % define the nested iteration.
+        ylabh = ylabel('Proportion PARP cleaved');   % add the ylabel.
+        
+%         ylabh = get(gca,'Ylabel');  % name the ylabel handle for use below.
+        
+        % same as with the xlabel.
+        set(ylabh,'fontweight','b','FontName','Times New Roman','Position',get(ylabh,'Position') - [0 0 0]);
+    end
+    
+    for ii = [1 2 4 5 6 7 8 9]      % ignore the 3rd (legend space).
+        subplot(3,3,ii)             % define iteration.
+        xlim([0 12])                % x axis boundaries.
+        
+        % set the ticks from 0 to 12 in increments of 2
+        set(gca,'XTick',0:2:12)
+        ylim([-0.1 1.1])        % change the y limits so 0 and 1 are visible.
+        set(gca,'YTick',[0 1])  % set the ticks as only 0 and 1.
+    end
+end
+
+% repeat for 2nd figure (but without legend).
+for i = 2
+    figure(i)
+    set(findall(gcf,'type','text'),'fontSize',10,'FontName','Times New Roman');
+    set(findobj(gcf,'type','line'),'LineWidth',1.5,'LineSmoothing','on');
+    for ii = 7:9
+        subplot(3,3,ii)
+        xlabh = xlabel('Time (hrs)');
+%         xlabh = get(gca,'Xlabel');
+        set(xlabh,'fontweight','b','FontName','Times New Roman','Position',get(xlabh,'Position') - [0 0 0]);
+    end
+    for ii = [1 4 7]
+        subplot(3,3,ii)
+        ylabh = ylabel('Proportion PARP cleaved');
+%         ylabh = get(gca,'Ylabel');
+        set(ylabh,'fontweight','b','FontName','Times New Roman','Position',get(ylabh,'Position') - [0 0 0]);
+    end
+    for ii = 1:9
+        subplot(3,3,ii)
+        xlim([0 12])
+        set(gca,'XTick',0:2:12)
+        ylim([-0.1 1.1])
+        set(gca,'YTick',[0 1])
+    end
+end
