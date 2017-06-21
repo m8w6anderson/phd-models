@@ -1,0 +1,99 @@
+%% Eigen-Analysis
+% This file computes the eigenvalues, eigenvectors and shows which species
+% most affect the eigenvalues that are most responsible for the system
+% dynamics.
+%
+
+clear all
+
+% Reset all parameters
+CUTintegrate_DLE;
+
+% Wild Type HCT116 cell (all initial conditions normal)
+[T Y]=ode15s(@CUTdegrhsVRoff,[0 12]*3600,IC,options,k,kr,kc,s,r,v,carry);
+
+eigvals = zeros(length(T), length(IC)); % set up matrix
+eigvec = eigvals;                       % same length as eigvals
+eigvecid = eigvals;                     % same length as eigvals
+
+%% Compute eigenvalues and eigenvectors
+% If dx/dt = f(x), then Jacobian = small change function * f(x)
+% so that the kth row of J ~= (f(x + eps*vk) - f(x))/eps where eps is a
+% very small change and vk represents the kth element of J.
+
+for p = 1:length(T)                 % iterate through each time step
+    eps = 1e-10;                     % set eps << 1
+    for q = 1:length(IC)            % iterate through species
+      vk = zeros(1, length(IC));    % set up vk vector...
+      vk(q) = eps;                  % ...as eps
+      
+      % compute the Jacobian using the kth row equation above, 
+      % where f = degrhsVRoff() and x = Y()
+      J(:,q) = (CUTdegrhsVRoff(T(p), (Y(p,:) + vk)', k,kr,kc,s,r,v,carry) +...
+          -CUTdegrhsVRoff(T(p), Y(p,:)', k,kr,kc,s,r,v,carry))/eps;
+      
+    end
+    
+    % [V,D] = eig(X) produces a diagonal matrix D of eigenvalues and a
+    % full matrix V whose columns are the corresponding eigenvectors so
+    % that X*V = V*D.
+    [evec, eval] = eig(J);
+    
+    % [Y,I] = max(X) returns the indices of the maximum values in vector I.
+    [exm, evi] = max(real(diag(eval)));
+    
+    
+    [eigvec(p,:), eigvecid(p,:)] = sort(abs(evec(:,evi)),'descend');
+    eigvals(p,:) = sort(real(eig(J)),1,'ascend');
+
+end
+
+% return % remove to output the earlier figures
+
+%% Eigenvalues and eigenvectors plots
+
+figure;
+
+% Plot the eigenvalues - the two positive EVs can be found by zooming in on
+% the zero line at around 4.3 hours.
+subplot(2,2,1)
+plot(T/3600, eigvals(:,:));
+xlim([0 12])
+set(gca,'XTick',0:2:12)
+% ylim([-140 20])
+% set(gca,'YTick',-140:20:20)
+ylabh(1) = ylabel('Eigenvalues');
+
+% zoomed in plot of the above (shows no zero ev's so can't be simplified)
+subplot(2,2,2)
+plot(T/3600, eigvals(:,:));
+xlim([0 12])
+set(gca,'XTick',0:2:12)
+ylim([-8.2E-4 8.2E-4])
+set(gca,'YTick',-8E-4:2E-4:8E-4)
+% set(gca,'yticklabel',{'-1','0','1','2'})
+% ylabh(2) = ylabel('Eigenvalues (x10^-^5)');
+
+% Eigenvectors
+subplot(2,2,3)
+plot(T/3600, eigvec(:,:));
+xlim([0 12])
+set(gca,'XTick',0:2:12)
+ylim([-0.05 1.05])
+set(gca,'YTick',[0 1])
+ylabh(3) = ylabel('Eigenvectors');
+xlabh = xlabel('Time (hrs)');
+
+% Eigenvector IDs
+subplot(2,2,4)
+plot(T/3600, eigvecid(:,1));
+xlim([0 12])
+set(gca,'XTick',0:2:12)
+ylim([-1 25])
+set(gca,'YTick',0:6:24)
+ylabh(4) = ylabel('Eigenvector IDs');
+xlabh = xlabel('Time (hrs)');
+
+set(findall(gcf,'type','text'),'fontSize',16,'FontName','Arial Narrow');
+set(findobj(gcf,'type','line'),'LineWidth',1.5,'LineSmoothing','on');
+
