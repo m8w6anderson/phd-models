@@ -1,0 +1,75 @@
+%% Quantify Blots
+
+% Preparation:
+% 1) Crop images so that each represents a single antibody and has a constant number of lanes.
+% 2) Crop images in Photoshop to roughly the same overall sizes, and make sure the blots themselves are roughly the same size.
+% 2) Name each file according to antibody, in a format that can be used as a title for its plot (eg. anti-BAX), and save files as *.png
+
+
+num_ABs = 4;                                                                % number of different antibodies
+lines = [' WType ';' BAX-/-';'PTEN-/-';'XIAP-/-'];                          % line/treatment names for use in x-axes of plots - need to be same character length so fill will spaces between quotes if needed.
+
+for i = 1:num_ABs
+
+[FileName,PathName] = uigetfile('*.png','Select blot image');               % UI for selecting blots file (all 4 lines for one antibody)
+all_lines = imread(strcat(PathName,FileName));                              % constructs the full path and reads it.
+all_lines_bw = rgb2gray(all_lines);                                         % converts RGB to greyscale
+all_lines_fix = all_lines_bw + (255 - max(max(all_lines_bw)));              % corrects for background colour - makes the lightest pixel completely white (255) and everything else to the same scale.
+% FileName = {FileName(1:end-4)};                                             % renames the file name to remove the .png extension for use in the plot title and background-corrected image title.
+FileNameNew = strcat(FileName,'Norm');                                   % appends a suffix to the file name for the background-corrected image.
+imwrite(all_lines_fix,gray,strcat({FileName(1:end-4)},'-Norm'),'png');                                 % writes each to a new file based on the name defined above (may need to dig around for the new files - usually in one of the higher folders).
+
+figure(1)                                                                   % make the figure so this can be overwritten and kept separate from the plots one made later.
+
+%% Copy line for number of lanes in each blot (and change numbers)
+
+one_line1 = imcrop(imshow(all_lines_fix,'InitialMagnification',500));       % UI for cropping each blot - this line needs as many copies as there are lanes in each blot, adding more of "one_line1", "one_line2", etc.
+one_line2 = imcrop(imshow(all_lines_fix,'InitialMagnification',500));       % (each blot needs the same number of lanes).
+one_line3 = imcrop(imshow(all_lines_fix,'InitialMagnification',500));
+one_line4 = imcrop(imshow(all_lines_fix,'InitialMagnification',500));
+
+%%
+
+threshold = 200;                                                            % this defines the threshold below which you count pixels (higher threshold = less background ignored; 200 is ok).
+
+%% Copy each 4-line set for number of lanes in each blot (and change numbers)
+
+idx = find(abs(one_line1)<threshold);                                       % finds and indexes every pixel in each cropped lane that lies below the threshold.
+mean_greyness = mean(one_line1(idx));                                       % works out the mean greyness of those pixels
+pixel_count = length(one_line1(idx));                                       % then counts each of those pixels
+all_quant(i,1) = (1/mean_greyness)*pixel_count;                             % quantification calculation: (1/mean_greyness)*pixel_count
+
+idx = find(abs(one_line2)<threshold);                                       % again, this whole set needs to be copied for the number of lanes in each blot.
+mean_greyness = mean(one_line2(idx));                                       % and again, make sure to change all the numbers in each copy to however many are needed (5, 6, etc.).
+pixel_count = length(one_line2(idx));
+all_quant(i,2) = (1/mean_greyness)*pixel_count;
+    
+idx = find(abs(one_line3)<threshold);
+mean_greyness = mean(one_line3(idx));
+pixel_count = length(one_line3(idx));
+all_quant(i,3) = (1/mean_greyness)*pixel_count;
+
+idx = find(abs(one_line4)<threshold);
+mean_greyness = mean(one_line4(idx));
+pixel_count = length(one_line4(idx));
+all_quant(i,4) = (1/mean_greyness)*pixel_count;
+
+%%
+
+all_quant(isnan(all_quant)) = 0;                                            % gets rid of NaN (not a number) entries, changing them to zero.
+imshow(all_lines_fix)                                                       % shows the background-corrected image.
+
+
+all_quant(i,:) = all_quant(i,:)/max(all_quant(i,:));                        % fixes the quantification calculations to make them relative to the maximum in each blot.
+
+figure(2)                                                                   % plots the quantified values in a new figure so it doesn't disappear each time a new blot is called.
+
+subplot(1,num_ABs,i)                                                        % iterates through each antibody and makes a new subplot for each.
+bar(all_quant(i,:))                                                         % plots a new barplot for each antibody iteration.
+set(gca,'XTickLabel',lines)                                                 % labels the x-axis columns based on values in "lines" vector.
+xlabel('Cell Line')                                                         % x-axis title
+ylim([0 1.1])                                                               % y-axis limit (looks better)
+ylabel('Relative Quantity')                                                 % y-axis title
+title(FileName)                                                             % plot title calls the new file name we fixed above.
+
+end
