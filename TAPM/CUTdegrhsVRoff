@@ -1,0 +1,111 @@
+function xp=CUTdegrhsVRoff(t,x,k,kr,kc,s,r,v,carry)
+% ODEs for each individual species in the system
+
+% Note that x here refers to the 'IC' vector set up and xp is the
+% derivative of x.
+xp=double(x);
+
+%% tBid
+% Logistic Model:
+xp(1)= s(1)*x(1)*(carry - x(1))/carry;
+
+%% Mcl1 (or Bclx) % OBSOLETE
+xp(2)= -k(1)*x(1)*x(2) +kr(1)*x(3) +...
+    s(2) -r(2)*x(2) ;
+
+%% Mcl1:tBid % OBSOLETE
+xp(3)= +k(1)*x(1)*x(2) -kr(1)*x(3) +...
+    -r(3)*x(3) ; 
+
+%% Bax
+xp(4)= -k(2)*x(1)*x(4) +kr(2)*x(5) +...
+    s(4) -r(4)*x(4) ; 
+
+%% tBid:Bax
+xp(5)=  k(2)*x(1)*x(4) -kr(2)*x(5) - kc(2)*x(5) +...
+    s(5) -r(5)*x(5) ; 
+
+%% Bax*
+xp(6)=  kc(2)*x(5) +... 
+    -k(3)*x(6) + kr(3)*x(7) +...
+    -r(6)*x(6) ; 
+
+%% Baxm (mitochondrial Bax - still activated)
+xp(7)=  k(3)*x(6) - kr(3)*x(7) +...  
+    -((1/v)^2)*k(4)*x(7)*x(8) +kr(4)*x(9) +...
+    -((1/v)^2)*2*k(5)*x(7)^2 +2*kr(5)*x(10) +...
+    -r(7)*x(7) ; 
+
+%% Bcl2
+xp(8)= -((1/v)^2)*k(4)*x(7)*x(8) +kr(4)*x(9) +...
+    -((1/v)^2)*k(6)*x(8)*x(10) +kr(6)*x(11) +...
+    -((1/v)^2)*k(8)*x(8)*x(12) +kr(8)*x(13) +...
+    s(8) -r(8)*x(8) ;  
+
+%% Baxm:Bcl2
+xp(9)=  ((1/v)^2)*k(4)*x(7)*x(8) -kr(4)*x(9) +...
+    -r(9)*x(9) ; 
+
+%% Bax2
+xp(10)=  ((1/v)^2)*k(5)*x(7)^2 -kr(5)*x(10) +...
+    -((1/v)^2)*k(6)*x(8)*x(10) +kr(6)*x(11) +...
+    -((1/v)^2)*2*k(7)*x(10)^2 +2*kr(7)*x(12) +...
+    -r(10)*x(10) ; 
+
+%% Bax2:Bcl2
+xp(11)=  ((1/v)^2)*k(6)*x(8)*x(10) -kr(6)*x(11) +...
+    -r(11)*x(11) ; 
+
+%% Bax4 
+xp(12)= ((1/v)^2)*k(7)*x(10)^2 -kr(7)*x(12)+... 
+    -((1/v)^2)*k(8)*x(8)*x(12) +kr(8)*x(13) +...
+    -((1/v)^2)*k(9)*x(14)*x(12) +kr(9)*x(15) +...
+    -r(12)*x(12) ; 
+
+%% Bax4:Bcl2
+xp(13)= ((1/v)^2)*k(8)*x(8)*x(12) -kr(8)*x(13) +...
+    -r(13)*x(13) ; 
+
+%% M (Mito)
+xp(14)= -((1/v)^2)*k(9)*x(14)*x(12) +kr(9)*x(15) +...
+    s(14) -r(14)*x(14) +...
+    r(16)*x(16); 
+
+%% Bax4:M
+xp(15)=  ((1/v)^2)*k(9)*x(14)*x(12) -kr(9)*x(15) -kc(9)*x(15) +...
+    -r(15)*x(15) ; 
+
+%% M* (membrane-bound activated Mito = activated pore)
+xp(16)=  kc(9)*x(15) +...
+    -((1/v)^2)*k(10)*x(16)*x(17) +kr(10)*x(18) +kc(10)*x(18) +...
+    -((1/v)^2)*k(11)*x(16)*x(20) +kr(11)*x(21) +kc(11)*x(21) +...
+    -r(16)*x(16) ; 
+
+%% CytoCm (mitochondrial CytoC)
+xp(17)= -((1/v)^2)*k(10)*x(16)*x(17) +kr(10)*x(18) +s(17) -r(17)*x(17); 
+
+%% M*:CytoCm
+xp(18)=  ((1/v)^2)*k(10)*x(16)*x(17) -kr(10)*x(18) -kc(10)*x(18) +...
+    -r(18)*x(18) ; 
+
+%% CytoCr (released/transitional CytoC)
+xp(19)=  kc(10)*x(18) -k(12)*x(19) +kr(12)*x(18) -r(19)*x(19); 
+
+%% Smacm (mitochondrial Smac)
+xp(20)= -((1/v)^2)*k(11)*x(16)*x(20) +kr(11)*x(21) +s(20) -r(20)*x(20); 
+
+%% M*:Smacm 
+xp(21)=  ((1/v)^2)*k(11)*x(16)*x(20) -kr(11)*x(21) -kc(11)*x(21) +...
+    -r(21)*x(21) ; 
+
+%% Smacr (released/transitional Smac)
+xp(22)=  kc(11)*x(21) -k(13)*x(22) +kr(13)*x(24) -r(22)*x(22); 
+
+%% CytoC (cytosolic)
+xp(23)=  k(12)*x(19) -kr(12)*x(23); % no degradation rate
+
+%% Smac (cytosolic)
+xp(24)=  k(13)*x(22) -kr(13)*x(24); % no degradation rate
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
