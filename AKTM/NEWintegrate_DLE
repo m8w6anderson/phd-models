@@ -1,0 +1,264 @@
+%% %%%%%%%%%%%%%%%%%        RUN THIS SCRIPT          %%%%%%%%%%%%%%%%%%%%%%
+%
+
+% Runs the other files first
+NEWinitials;
+NEWrates2;
+
+%% Timing
+
+t=[2 4 6 8 12 14 16]*60*60;   % time intervals
+tf = 16*3600;           % max time
+samp_freq=tf/60;        % sampling frequency
+dt=(tf-0)/samp_freq;
+
+% set the option parameters for the ODE file: 'degrhsVRoff.m'
+options=odeset('AbsTol',1E-10,'RelTol',1E-8,'maxstep',dt);
+
+%% Model Testing
+
+% % All Species in original model
+% NEWrates;
+% [T Y]=ode15s(@NEWdegrhsVRoff,[0 16]*3600,IC,options,k,kr,s,r,v);
+% plot(T/3600,Y(:,:))
+
+%% Individual Protein Species Plots
+
+LineColours(1,:) = [0.65,0.65,0.65]; % WT line colour
+LineColours(2,:) = [0.36,0.61,0.84]; % BAX line colour
+LineColours(3,:) = [0.93,0.49,0.19]; % PTEN line colour
+LineColours(4,:) = [1,0.75,0];       % XIAP line colour
+LineColours(5,:) = [0.47,0.58,0.24]; % PTEN/BAX-/- line colour
+% return
+figure(1);
+
+% Have to include a blank entry at position 3 to save space for the legend,
+% whilst still allowing use of the same for loop as the subplots (has to be
+% 9 entries. Also, the strings have to be the same length so spaces were
+% used to fill them up.
+FocalSpeciesName = [' C8*  ';' C3*  ';'blank ';' Bax* ';'Bax*_m';'Bcl-2 ';' Akt* ';' PTEN ';' XIAP '];
+FocalSpeciesID = [3 5 0 7 22 18 16 14 20];
+Ymax = zeros(1,5);
+
+for ii = [1 2 4 5 6 7 8 9]
+    NEWinitials; NEWrates2;
+    [T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 16]*3600,IC,options); Ymax(1) = max(Y(:,FocalSpeciesID(ii)));
+    subplot(3,3,ii), plot(T/3600,Y(:,FocalSpeciesID(ii)),'Color',LineColours(1,:))
+    title(FocalSpeciesName(ii,:))
+    hold on
+    NEWinitials; NEWrates2; IC(6)=0; s(6)=0;
+    [T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 16]*3600,IC,options); Ymax(2) = max(Y(:,FocalSpeciesID(ii)));
+    plot(T/3600,Y(:,FocalSpeciesID(ii)),'Color',LineColours(2,:))
+    NEWinitials; NEWrates2; IC(14)=0; s(14)=0;
+    [T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 16]*3600,IC,options); Ymax(3) = max(Y(:,FocalSpeciesID(ii)));
+    plot(T/3600,Y(:,FocalSpeciesID(ii)),'Color',LineColours(3,:))
+    NEWinitials; NEWrates2; IC(20)=0; s(20)=0;
+    [T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 16]*3600,IC,options); Ymax(4) = max(Y(:,FocalSpeciesID(ii)));
+    plot(T/3600,Y(:,FocalSpeciesID(ii)),'Color',LineColours(4,:))
+    Ymaxmax = max([Ymax(1) Ymax(2) Ymax(3) Ymax(4)]);
+    ylim([-Ymaxmax*0.05 Ymaxmax*1.05])
+    hold off
+end
+
+figure(2);
+
+FocalSpeciesName = [' Mito  ';' Mito* ';' blank ';'Cytoc_m';' Cytoc ';'Smac_m ';' Smac  ';' PARP  ';' cPARP '];
+FocalSpeciesID = [8 9 0 10 11 12 13 24 25];
+Ymax = zeros(1,5);
+
+for ii = [1 2 4 5 6 7 8 9]
+    NEWinitials; NEWrates2;
+    [T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 16]*3600,IC,options); Ymax(1) = max(Y(:,FocalSpeciesID(ii)));
+    subplot(3,3,ii), plot(T/3600,Y(:,FocalSpeciesID(ii)),'Color',LineColours(1,:))
+    title(FocalSpeciesName(ii,:))
+    hold on
+    NEWinitials; NEWrates2; IC(6)=0; s(6)=0;
+    [T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 16]*3600,IC,options); Ymax(2) = max(Y(:,FocalSpeciesID(ii)));
+    plot(T/3600,Y(:,FocalSpeciesID(ii)),'Color',LineColours(2,:))
+    NEWinitials; NEWrates2; IC(14)=0; s(14)=0;
+    [T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 16]*3600,IC,options); Ymax(3) = max(Y(:,FocalSpeciesID(ii)));
+    plot(T/3600,Y(:,FocalSpeciesID(ii)),'Color',LineColours(3,:))
+    NEWinitials; NEWrates2; IC(20)=0; s(20)=0;
+    [T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 16]*3600,IC,options); Ymax(4) = max(Y(:,FocalSpeciesID(ii)));
+    plot(T/3600,Y(:,FocalSpeciesID(ii)),'Color',LineColours(4,:))
+    Ymaxmax = max([Ymax(1) Ymax(2) Ymax(3) Ymax(4))]);
+    ylim([-Ymaxmax*0.05 Ymaxmax*1.05])
+    hold off
+end
+
+figure(3);
+
+NEWinitials; NEWrates2;
+[T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 16]*3600,IC,options); plot(T/3600,Y(:,25),'Color',LineColours(1,:))
+title('cPARP')
+hold on
+NEWinitials; NEWrates2; IC(6)=0; s(6)=0;
+[T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 16]*3600,IC,options); plot(T/3600,Y(:,25),'Color',LineColours(2,:))
+NEWinitials; NEWrates2; IC(14)=0; s(14)=0;
+[T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 16]*3600,IC,options); plot(T/3600,Y(:,25),'Color',LineColours(3,:))
+NEWinitials; NEWrates2; IC(20)=0; s(20)=0;
+[T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 16]*3600,IC,options); plot(T/3600,Y(:,25),'Color',LineColours(4,:))
+NEWinitials; NEWrates2; IC(6)=0; s(6)=0; IC(14)=0; s(14)=0;
+[T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 16]*3600,IC,options); plot(T/3600,Y(:,25),'--','Color',LineColours(5,:))
+ylim([-max(Y(:,25))*0.05 max(Y(:,25))*1.05])
+hold off
+
+
+for i = 1:2
+    figure(i)
+    legh = legend('WT','Bax-/-','PTEN-/-','XIAP-/-','Location',[0.69 0.66 0.09 0.24]);
+    set(legh,'fontSize',11,'FontName','Helvetica');
+    set(findall(gcf,'type','text'),'fontSize',13,'FontName','Helvetica');
+    set(findobj(gcf,'type','line'),'LineWidth',1.5,'LineSmoothing','on');
+    for ii = [1 2 4 5 6 7 8 9]
+        subplot(3,3,ii)
+        set(gca,'XTick',0:2:16);
+        xlim([0 16]);
+    end
+    for ii = [1 4 7]
+        subplot(3,3,ii)
+        ylabh = ylabel('Molecules / cell');
+        set(ylabh,'fontSize',14,'FontName','Helvetica');
+    end
+    for ii = 7:9
+        subplot(3,3,ii)
+        xlabh = xlabel('Hours post-TRAIL treatment');
+        set(xlabh,'fontSize',14,'FontName','Helvetica');
+    end
+    for ii = [1 4 7]
+        sph = subplot(3,3,ii);
+        sppos = get(sph, 'pos');
+        sppos(4) = 0.196;
+        set(sph, 'pos', sppos);
+    end
+    for ii = [2 5 8]
+        sph = subplot(3,3,ii);
+        sppos = get(sph, 'pos');
+        sppos(1) = sppos(1) - 0.03;
+        sppos(4) = 0.196;
+        set(sph, 'pos', sppos);
+    end
+    for ii = [6 9]
+        sph = subplot(3,3,ii);
+        sppos = get(sph, 'pos');
+        sppos(1) = sppos(1) - 0.06;
+        sppos(4) = 0.196;
+        set(sph, 'pos', sppos);
+    end
+end
+
+for i = 3
+    figure(i)
+    legh = legend('WT','Bax-/-','PTEN-/-','XIAP-/-','BAX/PTEN-/-','Location',[0.69 0.66 0.09 0.24]);
+    set(findobj(gcf,'type','line'),'LineWidth',1.5,'LineSmoothing','on');
+    set(gca,'XTick',0:2:16);
+    xlim([0 16]);
+    ylabh = ylabel('Molecules / cell');
+    set(ylabh,'fontSize',14,'FontName','Helvetica');
+    xlabh = xlabel('Hours post-TRAIL treatment');
+    set(xlabh,'fontSize',14,'FontName','Helvetica');
+end
+
+
+%% Protein Species Pair Plots
+
+return
+
+NEWrates2;
+
+figure(3);
+
+[T Y]=ode15s(@(t,x)NEWdegrhsVRoff2(t,x,k,kr,kc,s,r,v),[0 16]*3600,IC,options);
+
+species(1,:) = [2 3];
+subplot(3,3,1), plot(T/3600,Y(:,species(1,:))), title('Caspase 8')
+hold on, plot(T/3600,(Y(:,species(1,1))+Y(:,species(1,2))),'k')
+legh(1) = legend('pC8','C8*','pC8 + C8*','Location','East');
+hold off, legend('boxoff')
+
+species(2,:) = [6 7];
+subplot(3,3,2), plot(T/3600,Y(:,species(2,:))), title('Bax')
+hold on, plot(T/3600,(Y(:,species(2,1))+Y(:,species(2,2))),'k')
+legh(2) = legend('Bax','Bax*','Bax + Bax*','Location','West');
+hold off, legend('boxoff')
+
+species(3,:) = [15 16];
+subplot(3,3,3), plot(T/3600,Y(:,species(3,:))), title('Akt')
+hold on, plot(T/3600,(Y(:,species(3,1))+Y(:,species(3,2))),'k')
+legh(3) = legend('Akt','Akt*','Akt + Akt*','Location','West');
+hold off, legend('boxoff')
+
+species(4,:) = [14 40];
+subplot(3,3,4), plot(T/3600,Y(:,species(4,:))), title('PTEN')
+hold on, plot(T/3600,(Y(:,species(4,1))+Y(:,species(4,2))),'k')
+legh(4) = legend('PTEN','PTEN_U_b','PTEN + PTEN_U_b','Location','East');
+hold off, legend('boxoff')
+
+species(5,:) = [8 9];
+subplot(3,3,5), plot(T/3600,Y(:,species(5,:))), title('Mitochondrial Pore')
+hold on, plot(T/3600,(Y(:,species(5,1))+Y(:,species(5,2))),'k')
+legh(5) = legend('Mito','Mito*','Mito + Mito*','Location','East');
+hold off, legend('boxoff')
+
+species(6,:) = [10 11];
+subplot(3,3,6), plot(T/3600,Y(:,species(6,:))), title('Cytochrome c')
+hold on, plot(T/3600,(Y(:,species(6,1))+Y(:,species(6,2))),'k')
+legh(6) = legend('Cytoc_m','Cytoc','Cytoc_m + Cytoc','Location','East');
+hold off, legend('boxoff')
+
+species(7,:) = [12 13];
+subplot(3,3,7), plot(T/3600,Y(:,species(7,:))), title('Smac')
+hold on, plot(T/3600,(Y(:,species(7,1))+Y(:,species(7,2))),'k')
+legh(7) = legend('Smac_m','Smac','Smac_m + Smac','Location','East');
+hold off, legend('boxoff')
+
+species(8,:) = [4 5];
+subplot(3,3,8), plot(T/3600,Y(:,species(8,:))), title('Caspase 3')
+hold on, plot(T/3600,(Y(:,species(8,1))+Y(:,species(8,2))),'k')
+legh(8) = legend('pC3','C3*','pC3 + C3*','Location','East');
+hold off, legend('boxoff')
+
+species(9,:) = [24 25];
+subplot(3,3,9), plot(T/3600,Y(:,species(9,:))), title('PARP')
+hold on, plot(T/3600,(Y(:,species(9,1))+Y(:,species(9,2))),'k')
+legh(9) = legend('PARP','cPARP','PARP + cPARP','Location','East');
+hold off, legend('boxoff')
+
+for i = 1
+    figure(i)
+    for ii = 1:9
+        yupper = max(max(Y(:,species(ii,:))))*1.05;
+        ylower = min(min(Y(:,species(ii,:)))) - max(max(Y(:,species(ii,:))))*0.05;
+        subplot(3,3,ii)
+        ylim([ylower yupper])
+    end
+    set(findall(gcf,'type','text'),'fontSize',13,'FontName','Helvetica');
+    set(findobj(gcf,'type','line'),'LineWidth',1.5,'LineSmoothing','on');
+    set(gca,'XTick',0:2:16)
+    for ii = [1 4 7]
+        subplot(3,3,ii)
+        ylabh = ylabel('Molecules / cell');
+        set(ylabh,'fontSize',14,'FontName','Helvetica');
+    end
+    for ii = 7:9
+        subplot(3,3,ii)
+        xlabh = xlabel('Hours post-TRAIL treatment');
+        set(xlabh,'fontSize',14,'FontName','Helvetica');
+    end
+    for ii = 1:9
+        set(legh(ii),'fontSize',11,'FontName','Helvetica');
+    end
+    for ii = [2 5 8]
+        sph = subplot(3,3,ii);
+        sppos = get(sph, 'pos');
+        sppos(1) = sppos(1) - 0.03;
+        set(sph, 'pos', sppos);
+    end
+    for ii = [3 6 9]
+        sph = subplot(3,3,ii);
+        sppos = get(sph, 'pos');
+        sppos(1) = sppos(1) - 0.06;
+        set(sph, 'pos', sppos);
+    end
+end
+
