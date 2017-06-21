@@ -1,0 +1,108 @@
+
+% #########################################################################
+% ## COUNTING CELLS from Incucyte Videos (through ImageJ (Fiji) / Miji) ###
+% #########################################################################
+
+%% Add java files to workspace
+
+javaaddpath 'F:\mOki\08 Google Drive\Google Drive\UNI\02 BRISTOL\PhD\Modelling\MATLAB\Computer Vision\ij.jar'
+javaaddpath 'F:\mOki\08 Google Drive\Google Drive\UNI\02 BRISTOL\PhD\Modelling\MATLAB\Computer Vision\mij.jar'
+
+%% Initial setup
+
+MIJ.start;
+MIJ.closeAllWindows
+
+% Set up the results matrix
+total_rows = 8;
+num_cols = 12;
+fields_per_well = 2;
+total_cols = num_cols*fields_per_well;
+num_frames = 35;
+results = zeros(total_rows,total_cols,num_frames);
+
+% Set up the key for the 'results' and 'aviNames' matrices
+rows = {'A' 'B' 'C' 'D' 'E' 'F' 'G' 'H'};
+for j = 1:length(rows)
+    for i = 1:total_cols
+        if mod(i,2) == 1
+            names{j,i} = strcat(rows{j},num2str((i+1)/2),'_1');
+        else
+            names{j,i} = strcat(rows{j},num2str(i/2),'_2');
+        end
+    end
+end
+
+% Read files Phase_1.avi through Phase_196.avi.
+% Files should be in the current directory.
+aviNames = repmat({''},total_rows,total_cols);
+m = 1;
+% Iterate through each row
+for k = 1:total_rows
+    
+    % Iterate through columns in each incucyte row (i.e. A1_1, A1_2, B1_1, ...)
+    for j = 1:total_cols
+        
+        % Create an image filename, and read it in to a variable called imageData.
+        aviNames{k,j} = strcat('Phase_', num2str(m), '.avi');
+        m = m + 1;
+        if exist(aviNames{k,j}, 'file')
+            VidObj = VideoReader(aviNames{k,j});
+            Vid = read(VidObj);
+        else
+            fprintf('File %s does not exist.\n', aviNames{k,j});
+        end
+        
+        % Iterate through video frames
+        for i = 1:num_frames
+            frame = Vid(:,:,1,i);
+            MIJ.createImage('Frame', frame, true);
+            MIJ.selectWindow('Frame');
+            MIJ.run('Bandpass Filter...', 'filter_large=30 filter_small=6 suppress=None tolerance=5');
+            MIJ.selectWindow('Frame');
+            MIJ.run('Find Maxima...', 'noise=2 output=Count exclude light');
+            results(k,j,i) = MIJ.getResultsTable;
+            MIJ.selectWindow('Results');
+            MIJ.run('Close');
+            MIJ.selectWindow('Frame');
+            MIJ.run('Close');
+        end
+        display([aviNames{k,j} ' = ' names{k,j}])
+    end
+    
+end
+
+% %% Video Analysis
+% 
+% % Iterate through each row
+% for k = 1:total_rows
+%     
+%     % Iterate through columns in each incucyte row (i.e. A1_1, A1_2, B1_1, ...)
+%     for j = 1:num_cols*fields_per_well
+%         
+%         MIJ.run('AVI...', 'open first=1 last=35 use convert');
+%         MIJ.run('Duplicate...', 'title=[Vid Copy] duplicate range=1-35');
+% 
+%         % Iterate through video frames
+%         for i = 1:num_frames
+%             
+%             MIJ.selectWindow('Vid Copy');
+%             MIJ.run('Bandpass Filter...', 'filter_large=30 filter_small=6 suppress=None tolerance=5');
+%             MIJ.run('Duplicate...', 'title=[Frame Copy]');
+%             MIJ.selectWindow('Frame Copy');
+%             MIJ.run('Find Maxima...', 'noise=2 output=Count exclude light');
+%             results(k,j,i) = MIJ.getResultsTable;
+%             MIJ.selectWindow('Results');
+%             MIJ.run('Close');
+%             MIJ.selectWindow('Frame Copy');
+%             MIJ.run('Close');
+%             MIJ.selectWindow('Vid Copy');
+%             MIJ.run('Next Slice [>]');
+%             
+%         end
+%         
+%         MIJ.selectWindow('Vid Copy');
+%         MIJ.run('Close');
+%     end
+%     
+% end
