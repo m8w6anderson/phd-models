@@ -1,0 +1,22 @@
+%% Set initial concentrations
+
+TRAIL   = 1000;       % 50 ng/ml TRAIL ~= 1000/cell TRAIL
+pC8     = 3.5E3;   % pro-Caspase-8 
+pC3     = 1E5;     % pro-Caspase-3
+Bax     = 8E4;        % Bax
+XIAP    = 3E4;    % XIAP -- inhibits C3* and PTEN through ubiquitinisation
+Bcl2    = 2E4;        % Bcl-2 -- inhibits Bax*_m
+Mito    = 5E4;        % Mito -- activates the pore when bound to Bax*_m
+Cytoc_m = 5E5;        % Mitochondrial Cytochrome c
+Smac_m  = 5E4;        % Mitochondrial Smac
+PTEN    = 5E5;        % PTEN (always active)
+Akt     = 1E5;        % Inactive Akt (activated by unknown: Akt <-> Akt*)
+PARP    = 1E5;        % Need PARP as the reporter of apoptosis
+
+v       = .07;        % mitochondrial compartment vol. ~7% < cytosolic compartment
+
+% Initial Condition species vector [# molecules in cytosol] 
+IC = zeros(41,1);
+IC(1)=TRAIL;    IC(2)=pC8;      IC(4)=pC3;      IC(6)=Bax;   
+IC(8)=Mito;     IC(10)=Cytoc_m; IC(12)=Smac_m;  IC(14)=PTEN;
+IC(15)=Akt;     IC(18)=Bcl2;    IC(20)=XIAP;    IC(24)=PARP;
