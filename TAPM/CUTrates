@@ -1,0 +1,79 @@
+%% %%%%%%%%% Reaction Definitions and corresponding rates (Aldridge et al. 2011)%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% k() denotes forward reaction / kr() is reverse / kc() is catalytic / %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%% C8* is active form of pC8 / <-> is a reversible reaction %%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% tBid + Mcl-1 <-> tBid:Mcl-1                                              k(1), kr(1)            
+% tBid + Bax <-> tBid:Bax -> tBid + Bax*                                   k(2), kr(2), kc(2)
+% Bax* <-> Bax*_m                                                          k(3), kr(3)
+% Bax*_m + Bcl-2 <-> Bax*_m:Bcl-2                                          k(4), kr(4)
+% Bax*_m + Bax*_m <-> Bax*2_m                                              k(5), kr(5)
+% Bax*2_m + Bcl-2 <-> Bax*2_m:Bcl-2                                        k(6), kr(6)
+% Bax*2_m + Bax*2_m <-> Bax*4_m                                            k(7), kr(7)
+% Bax*4_m + Bcl-2 <-> Bax*4_m:Bcl-2                                        k(8), kr(8)
+% Bax*4_m + Pore <-> Bax*4_m:Pore -> Pore*                                 k(9), kr(9), kc(9)
+% Pore* + Cytoc_m <-> Pore*:Cytoc_m -> Pore* + Cytoc_r                     k(10), kr(10), kc(10)
+% Pore* + Smac_m <-> Pore*:Smac_m -> Pore* + Smac_r                        k(11), kr(11), kc(11)
+% Cytoc_r <-> Cytoc                                                        k(12), kr(12)
+% Smac_r <-> Smac                                                          k(13), kr(13)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% The Rates...
+
+k = zeros(13,1);
+kr = zeros(13,1);
+kc = zeros(13,1);
+
+% tBid + Mcl-1 <-> tBid:Mcl-1       
+k(1)=1E-6; kr(1)=1E-3; 
+
+% tBid + Bax <-> tBid:Bax -> tBid + Bax*    
+k(2)=1E-7; kr(2)=1E-3; kc(2)=1;
+
+% Bax* <-> Bax*_m 
+k(3)=trans_in; kr(3)=trans_out;
+
+% Bax*_m + Bcl-2 <-> Bax*_m:Bcl-2
+k(4)=1E-6; kr(4)=1E-3; 
+
+% Bax*_m + Bax*_m <-> Bax*2_m
+k(5)=1E-6; kr(5)=1E-3;
+
+% Bax*2_m + Bcl-2 <-> Bax*2_m:Bcl-2
+k(6)=1E-6; kr(6)=1E-3;
+
+% Bax*2_m + Bax*2_m <-> Bax*4_m 
+k(7)=1E-6; kr(7)=1E-3;
+
+% Bax*4_m + Bcl-2 <-> Bax*4_m:Bcl-2 
+k(8)=1E-6; kr(8)=1E-3; 
+
+% Bax*4_m + Pore <-> Bax*4_m:Pore -> Pore*  
+k(9)=1E-6; kr(9)=1E-3; kc(9)=1;
+
+% Pore* + Cytoc_m <-> Pore*:Cytoc_m -> Pore* + Cytoc_r
+k(10)=2E-6; kr(10)=1E-3; kc(10)=10; % IT
+
+% Pore* + Smac_m <-> Pore*:Smac_m -> Pore* + Smac_r   
+k(11)=2E-6; kr(11)=1E-3; kc(11)=10; % IT
+
+% Cytoc_r <-> Cytoc
+k(12)=trans_out; kr(12)=0; % kr=0 to show total release
+
+
+% Smac_r <-> Smac
+k(13)=trans_out; kr(13)=0; % kr=0 to show total release
+
+
+
+%% Assign degredation rates
+r=ones(24,1).*(1/2)*(1/24)*(1/3600);    % = 5.8E-6 degradation rates for all species, except...
+r(16)=.0001;                            % M* -> M (i.e. Pore deactivation and Mito reproduction)
+
+
+%% Assign the synthesis rates
+s = zeros(24,1); %synthesis rates
+for i=[2,4,8,14,17,20],
+  s(i)=r(i).*IC(i); % function of degredation rates and initial conditions
+end,
+s(17)=0; s(20)=0; % prevent new synthesis of cytochrome c and SMAC
